@@ -5,10 +5,17 @@ Version: 0.1.0
 Authors@R: c(
     person("Thomas", "Maierhofer", email = "thomasjmaierhofer@gmail.com", role = c("aut", "cre")))
 URL: https://github.com/maierhofert/classiFunc
-Description: This package efficiently implements a k-nearest neighbor estimator
-for functional data classification.
-License: What license is it under?
+Description: This package implements an efficient k-nearest neighbor estimator for functional data classification.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
-Suggests: testthat
+Suggests: 
+    testthat,
+    fda.usc
+Imports:
+    BBmisc (>= 1.11),
+    checkmate (>= 1.8.2),
+    fda,
+    proxy
+
