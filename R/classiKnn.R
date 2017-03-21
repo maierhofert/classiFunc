@@ -263,6 +263,3 @@ computeDistMat = function(x, y = NULL,
   }
 
 }
-
-
-

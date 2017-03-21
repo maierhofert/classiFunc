@@ -1,4 +1,3 @@
-
 #' @title The classiFunc package
 #'
 #' @description Creates a knn estimator for functional data using efficiently
