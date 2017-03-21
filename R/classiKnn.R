@@ -94,13 +94,12 @@
 #' classes = Phoneme[,"target"]
 #'
 #' set.seed(123)
-#' # Use 1% of teh data as training set and 1% as test set
-#' train_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
-#' test_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
+#' # Use 80% of data as training set and 20% as test set
+#' train_inds = sample(1:nrow(Phoneme), size = 0.8 * nrow(Phoneme), replace = FALSE)
+#' test_inds = (1:nrow(Phoneme))[!(1:nrow(Phoneme)) %in% train_inds]
 #'
-#' # subsample colums for speed up
+#' # create functional data as matrix with observations as rows
 #' fdata = Phoneme[,!colnames(Phoneme) == "target"]
-#' fdata = fdata[, c(TRUE, rep(FALSE, 10))]
 #'
 #' # create 3 nearest neighbor classifier with Euclidean distance (default) of the
 #' # first order derivative of the data
@@ -108,7 +107,7 @@
 #'                  nderiv = 1L, knn = 3L)
 #'
 #' # predict the model for the test set
-#' pred = predict(mod, predict.type = "prob")
+#' pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
                      metric = "Euclidean", nderiv = 0L, derived = FALSE,
@@ -216,7 +215,18 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
 return(result)
 }
 
-
+#' @title Compute a distance matrix
+#'
+#' @description This mainly internal function offers a unified framework to acces the
+#' \code{\link[proxy]{dist}} function from the \code{proxy} package and additional
+#' (semi-)metrics. For implemented methods see \code{\link{classiKnn}}.
+#'
+#' @param x matrix containing observations as rows
+#' @param y see \code{x}. The default \code{NULL} uses \code{y = x}.
+#' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 indizes used to define subspaces
+#' @param method character string specifying the (semi-)metric to be used.
+#' on the domain of \code{x}, used in different (semi-)metrics.
+#' @param ... additional parameters to the (semi-)metrics.
 #' @export
 computeDistMat = function(x, y = NULL,
                           method = "Euclidean",
@@ -238,7 +248,7 @@ computeDistMat = function(x, y = NULL,
   if(method == "shortEuclidean") {
     stopifnot(dmin >= 1L)
     stopifnot(dmax <= ncol(x))
-    computeSemimetric(x[,dmin:dmax], y[,dmin:dmax], "Euclidean")
+    computeDistMat(x[,dmin:dmax], y[,dmin:dmax], "Euclidean")
   }
 
   if(method == "mean") {

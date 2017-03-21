@@ -113,13 +113,12 @@ data(Phoneme)
 classes = Phoneme[,"target"]
 
 set.seed(123)
-# Use 1\% of teh data as training set and 1\% as test set
-train_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
-test_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
+# Use 80\% of data as training set and 20\% as test set
+train_inds = sample(1:nrow(Phoneme), size = 0.8 * nrow(Phoneme), replace = FALSE)
+test_inds = (1:nrow(Phoneme))[!(1:nrow(Phoneme)) \%in\% train_inds]
 
-# subsample colums for speed up
+# create functional data as matrix with observations as rows
 fdata = Phoneme[,!colnames(Phoneme) == "target"]
-fdata = fdata[, c(TRUE, rep(FALSE, 10))]
 
 # create 3 nearest neighbor classifier with Euclidean distance (default) of the
 # first order derivative of the data
@@ -127,5 +126,5 @@ mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
                  nderiv = 1L, knn = 3L)
 
 # predict the model for the test set
-pred = predict(mod, predict.type = "prob")
+pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
 }

@@ -5,8 +5,8 @@ test_that("classiKnn works", {
   classes = Phoneme[,"target"]
 
   set.seed(123)
-  train_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
-  test_inds = sample(1:nrow(Phoneme), size = 0.01 * nrow(Phoneme), replace = FALSE)
+  train_inds = sample(1:nrow(Phoneme), size = 0.8 * nrow(Phoneme), replace = FALSE)
+  test_inds = (1:nrow(Phoneme))[!(1:nrow(Phoneme)) %in% train_inds]
 
   Phoneme = Phoneme[,!colnames(Phoneme) == "target"]
   Phoneme = Phoneme[, c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE)]
