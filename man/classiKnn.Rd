@@ -6,7 +6,8 @@
 \usage{
 classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   metric = "Euclidean", nderiv = 0L, derived = FALSE,
-  deriv.method = "base.diff", own.metric = NULL, ...)
+  deriv.method = "base.diff", custom.metric = function(x, y, ...) {    
+  return(sqrt(sum((x - y)^2))) }, ...)
 }
 \arguments{
 \item{classes}{[\code{factor(nrow(fdata))}]\cr
@@ -28,6 +29,8 @@ character string describing the distance function to be used.
   \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
   \item{\code{Lp, Minkowski}}{the distance for an Lp-space.}
   \item{\code{Manhattan}}{equals \code{Lp} with \code{p = 1}.}
+  \item{\code{supremum, max, maximum}}{equals \code{Lp} with \code{p = Inf}.
+  The supremal pointwise difference between the curves.}
   \item{\code{...}}{all other available measures for \code{\link[proxy]{dist}}.}
   \item{\code{shortEuclidean}}{Euclidean distance on a limited part of the domain.
   Additional arguments \code{dmin} and \code{dmax} can be specified, giving
@@ -45,12 +48,16 @@ character string describing the distance function to be used.
   The points \code{t1} and \code{t2} are the indices  in an evenly spaced sequence
   from \code{grid[1]} to \code{grid[length(grid)]} of which to compare the
   jump height. The default values are \code{t1 = 1} and \code{t2 = length(grid)}.}
-  \item{\code{points}}{the differences at certain observation points, also
-  called "points of impact". These are specified as a vector of indices
-  of an evenly spaced sequence from \code{grid[1]} to \code{grid[length(grid)]}.
-  The default value is \code{1L}.}
+  \item{\code{globMax}}{the difference of the curves global maxima.}
+  \item{\code{globMin}}{the difference of the curves global minima}
+  \item{\code{points}}{the mean absolute differences at certain observation
+  points \code{poi}, also  called "points of impact". These are specified as
+  a vector of indices of an evenly spaced sequence from \code{grid[1]}
+  to \code{grid[length(grid)]}.
+  The default value is \code{1:length(grid)}, which results in the Manhattan
+  distance.}
   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
-  own distance function in the argument \code{own.metric}}
+  own distance function in the argument \code{custom.metric}}
  }}
 
 \item{nderiv}{[\code{integer(1)}]\cr
@@ -72,11 +79,13 @@ class \code{\link[fda]{fd}} and deriving this using \code{fda::\link[fda]{deriv.
 The second variant implies smoothing, which can be preferable for calculating
 high order derivatives.}
 
-\item{own.metric}{[\code{function(x, y, ...)}]\cr
-returning a distance matrix with dimensions \code{nrow(x)} x \code{nrow(y)}.
+\item{custom.metric}{[\code{function(x, y, ...)}]\cr
+function returning the numeric distance between functional observations
+\code{x} and \code{y}. The default is the Euclidean distance.
 See how to implement your distance function in \code{\link[proxy]{dist}}}
 
-\item{...}{further arguments to and from other methods.}
+\item{...}{further arguments to and from other methods. Especially to
+\code{\link{fdataTransform}} and \code{\link{computeDistMat}}.}
 }
 \value{
 \code{classiKnn} returns an object of class \code{"classiKnn"}. \cr

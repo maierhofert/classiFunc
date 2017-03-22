@@ -3,6 +3,7 @@
 S3method(predict,classiKnn)
 export(classiKnn)
 export(computeDistMat)
+export(metric.choices)
 import(BBmisc)
 import(checkmate)
 import(proxy)

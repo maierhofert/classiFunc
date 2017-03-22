@@ -23,6 +23,8 @@
 #'   \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
 #'   \item{\code{Lp, Minkowski}}{the distance for an Lp-space.}
 #'   \item{\code{Manhattan}}{equals \code{Lp} with \code{p = 1}.}
+#'   \item{\code{supremum, max, maximum}}{equals \code{Lp} with \code{p = Inf}.
+#'   The supremal pointwise difference between the curves.}
 #'   \item{\code{...}}{all other available measures for \code{\link[proxy]{dist}}.}
 #'   \item{\code{shortEuclidean}}{Euclidean distance on a limited part of the domain.
 #'   Additional arguments \code{dmin} and \code{dmax} can be specified, giving
@@ -40,12 +42,16 @@
 #'   The points \code{t1} and \code{t2} are the indices  in an evenly spaced sequence
 #'   from \code{grid[1]} to \code{grid[length(grid)]} of which to compare the
 #'   jump height. The default values are \code{t1 = 1} and \code{t2 = length(grid)}.}
-#'   \item{\code{points}}{the differences at certain observation points, also
-#'   called "points of impact". These are specified as a vector of indices
-#'   of an evenly spaced sequence from \code{grid[1]} to \code{grid[length(grid)]}.
-#'   The default value is \code{1L}.}
+#'   \item{\code{globMax}}{the difference of the curves global maxima.}
+#'   \item{\code{globMin}}{the difference of the curves global minima}
+#'   \item{\code{points}}{the mean absolute differences at certain observation
+#'   points \code{poi}, also  called "points of impact". These are specified as
+#'   a vector of indices of an evenly spaced sequence from \code{grid[1]}
+#'   to \code{grid[length(grid)]}.
+#'   The default value is \code{1:length(grid)}, which results in the Manhattan
+#'   distance.}
 #'   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
-#'   own distance function in the argument \code{own.metric}}
+#'   own distance function in the argument \code{custom.metric}}
 #'  }
 #' @param nderiv [\code{integer(1)}]\cr
 #'   The order of derivation on which the metric shall be computed.
@@ -63,11 +69,13 @@
 #' class \code{\link[fda]{fd}} and deriving this using \code{fda::\link[fda]{deriv.fd}}.
 #' The second variant implies smoothing, which can be preferable for calculating
 #' high order derivatives.
-#' @param own.metric [\code{function(x, y, ...)}]\cr
-#' returning a distance matrix with dimensions \code{nrow(x)} x \code{nrow(y)}.
+#' @param custom.metric [\code{function(x, y, ...)}]\cr
+#' function returning the numeric distance between functional observations
+#' \code{x} and \code{y}. The default is the Euclidean distance.
 #' See how to implement your distance function in \code{\link[proxy]{dist}}
 #' @param ...
-#' further arguments to and from other methods.
+#' further arguments to and from other methods. Especially to
+#' \code{\link{fdataTransform}} and \code{\link{computeDistMat}}.
 #' @return \code{classiKnn} returns an object of class \code{"classiKnn"}. \cr
 #' An object of class \code{"classiKnn"} is a  list containing the following
 #' components:
@@ -120,7 +128,9 @@
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
                      metric = "Euclidean", nderiv = 0L, derived = FALSE,
                      deriv.method = "base.diff",
-                     own.metric = NULL, ...) {
+                     custom.metric = function(x, y, ...) {
+                       return(sqrt(sum((x - y)^2)))},
+                     ...) {
   # check inputs
   if(class(fdata) == "data.frame")
     fdata = as.matrix(fdata)
@@ -131,7 +141,12 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
     classes = factor(classes)
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
-  assertChoice(metric, choices = "Euclidean") # TODO
+
+  proxy.set = unlist(summary(proxy::pr_DB)$names)
+  assertChoice(metric, choices = c(proxy.set,
+                                   "shortEuclidean", "mean", "relAreas",
+                                   "jump", "globMax", "globMin",
+                                   "points", "custom.metric"))
   assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
 
   # check if data is evenly spaced  -> respace
@@ -160,14 +175,15 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
              knn = knn,
              metric = metric,
              nderiv = nderiv,
-             this.fdataTransform = this.fdataTransform)
+             this.fdataTransform = this.fdataTransform,
+             ...)
   class(ret) = "classiKnn"
 
   return(ret)
 }
 
 
-#' @title create a preprocessing function
+#' @title Create a preprocessing pipeline function
 #'
 #' @description internal function, documented due to the importance of its
 #' concept. Creates a pipeline function to do all the
@@ -226,7 +242,8 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
   assertChoice(predict.type, c("response", "prob"))
 
 
-  dist.mat = computeDistMat(object$proc.fdata, newdata, method = object$metric, ...)
+  dist.mat = computeDistMat(x = object$proc.fdata, y = newdata,
+                            method = object$metric, object, ...)
 
   # matrix containing which nearest neighbor the training observation is
   # for the new observation
@@ -244,54 +261,7 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
       table(object$classes[x][1:object$knn]) / object$knn
     }))
   }
-return(result)
+  return(result)
 }
 
-#' @title Compute a distance matrix
-#'
-#' @description This mainly internal function offers a unified framework to acces the
-#' \code{\link[proxy]{dist}} function from the \code{proxy} package and additional
-#' (semi-)metrics. For implemented methods see \code{\link{classiKnn}}.
-#'
-#' @param x matrix containing observations as rows
-#' @param y see \code{x}. The default \code{NULL} uses \code{y = x}.
-#' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 indizes used to define subspaces
-#' @param method character string specifying the (semi-)metric to be used.
-#' on the domain of \code{x}, used in different (semi-)metrics.
-#' @param ... additional parameters to the (semi-)metrics.
-#' @export
-computeDistMat = function(x, y = NULL,
-                          method = "Euclidean",
-                          dmin = 1L, dmax = ncol(x),
-                          dmin1 = 1L, dmax1 = ncol(x),
-                          dmin2 = 1L, dmax2 = ncol(x),...) {
-  requirePackages("proxy")
-  proxy.set = unlist(summary(proxy::pr_DB)$names)
 
-  assertChoice(method, choices = c(proxy.set))
-
-  if(method %in% proxy.set) {
-    return(as.matrix(proxy::dist(x, y, method = method, ...)))
-  }
-
-  # new semimetrics from fuchs etal 2015
-  # they need two matrices as x and y
-  if(is.null(y)) y = x
-  if(method == "shortEuclidean") {
-    stopifnot(dmin >= 1L)
-    stopifnot(dmax <= ncol(x))
-    computeDistMat(x[,dmin:dmax], y[,dmin:dmax], "Euclidean")
-  }
-
-  if(method == "mean") {
-    return(outer(rowMeans(x), rowMeans(y), "-"))
-  }
-
-  if(method == "relAreas") {
-    stopifnot(dmin1 >= 1L)
-    stopifnot(dmax1 <= ncol(x))
-    stopifnot(dmin2 >= 1L)
-    stopifnot(dmax2 <= ncol(x))
-  }
-
-}

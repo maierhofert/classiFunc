@@ -2,7 +2,7 @@
 % Please edit documentation in R/classiKnn.R
 \name{fdataTransform}
 \alias{fdataTransform}
-\title{create a preprocessing function}
+\title{Create a preprocessing pipeline function}
 \usage{
 fdataTransform(grid, nderiv, derived, evenly.spaced, no.missing, deriv.method,
   ...)
