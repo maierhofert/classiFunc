@@ -4,9 +4,10 @@
 \alias{classiFunc}
 \title{The classiFunc package}
 \description{
-This package implements a knn estimator for functional data using efficiently
-implemented semimetrics in \code{\link{classiKnn}}. Currently
-supported distance measures are all \code{metrics} implemented in \code{\link[proxy]{dist}}
+This package implements a knn estimator in \code{\link{classiKnn}}
+for functional data using efficiently implemented semimetrics.
+Currently supported distance measures are all \code{metrics} implemented in
+\code{\link[proxy]{dist}}
 and all semimetrics suggested in
 Fuchs etal. 2015, Nearest neighbor ensembles for functional data with
 interpretable feature selection,

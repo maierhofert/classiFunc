@@ -42,3 +42,27 @@
 #' }
 #' @source \url{http://timeseriesclassification.com/description.php?Dataset=Phoneme}
 "Phoneme"
+
+
+#' Yoga poses of two actors
+#'
+#' A dataset containing the outlines of two actors transiting between yoga poses.
+#' This large data set is used for profiling.
+#'
+#' The dataset was obtained by capturing two actors transiting between yoga poses
+#' in front of a green screen. The problem is to discriminate between one actor
+#' (male) and another (female). Each image was converted to a one dimensional
+#' series by finding the outline and measuring the distance of the outline to
+#' the centre. The dataset was obtained by capturing two actors transiting
+#' between yoga poses in front of a green screen. The problem is to discriminate
+#' between one actor (male) and another (female). Each image was converted to a
+#' one dimensional series by finding the outline and measuring the distance of
+#' the outline to the centre.
+#'
+#' @section Format A data frame with 100 rows (=observations) and 65 variables:
+#' \describe{
+#'   \item{col 1:425}{one functional observation.}
+#'   \item{target}{encoding the actor}
+#' }
+#' @source \url{http://www.timeseriesclassification.com/description.php?Dataset=Yoga}
+"Yoga"

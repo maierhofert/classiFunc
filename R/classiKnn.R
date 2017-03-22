@@ -55,6 +55,14 @@
 #' which will lead to numerical derivation if \code{nderiv >= 1L} by applying
 #' \code{\link[fda]{deriv.fd}} on a \code{\link[fda]{Data2fd}} representation of
 #' \code{fdata}.
+#' @param deriv.method [\code{character(1)}]\cr
+#' character indicate which method should be used for derivation. Currently
+#' implemented are \code{"base.diff"}, the default, and \code{"fda.deriv.fd"}.
+#' \code{"base.diff"} uses the method \code{base::\link[base]{diff}} for equidistant measures
+#' without missing values, which is faster than transforming the data into the
+#' class \code{\link[fda]{fd}} and deriving this using \code{fda::\link[fda]{deriv.fd}}.
+#' The second variant implies smoothing, which can be preferable for calculating
+#' high order derivatives.
 #' @param own.metric [\code{function(x, y, ...)}]\cr
 #' returning a distance matrix with dimensions \code{nrow(x)} x \code{nrow(y)}.
 #' See how to implement your distance function in \code{\link[proxy]{dist}}
@@ -111,6 +119,7 @@
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
                      metric = "Euclidean", nderiv = 0L, derived = FALSE,
+                     deriv.method = "base.diff",
                      own.metric = NULL, ...) {
   # check inputs
   if(class(fdata) == "data.frame")
@@ -123,6 +132,7 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
   assertChoice(metric, choices = "Euclidean") # TODO
+  assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
 
   # check if data is evenly spaced  -> respace
   evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)], length.out = length(grid)))
@@ -138,7 +148,8 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   this.fdataTransform = fdataTransform(fdata = fdata, grid = grid,
                                        nderiv = nderiv, derived = derived,
                                        evenly.spaced = evenly.spaced,
-                                       no.missing = no.missing, ...)
+                                       no.missing = no.missing,
+                                       deriv.method = deriv.method, ...)
   proc.fdata = this.fdataTransform(fdata)
 
   ret = list(call = as.list(match.call()),
@@ -155,19 +166,40 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   return(ret)
 }
 
-# param ... additional arguments to fda::Data2fd
-# create a preprocessing function
-# it uses arguments from the global environment
-fdataTransform = function(fdata, grid, nderiv, derived, evenly.spaced, no.missing, ...) {
+
+#' @title create a preprocessing function
+#'
+#' @description internal function, documented due to the importance of its
+#' concept. Creates a pipeline function to do all the
+#' preprocessing needed in \code{\link{classiKnn}}. This is helpful to ensure,
+#' that the data preprocessing is carried out in exactly the same way for the
+#' train and the test set in \code{predict.classiKnn}.
+#'
+#' @param grid,nderiv,derived,evenly.spaced,no.missing,deriv.method see
+#' \code{\link{classiKnn}}
+#' @param ... additional arguments to fda::Data2fd
+#' @return pipeline function taking one argument \code{fdata}. The returned
+#' function carries out all the preprocessing needed for the calling model
+#' of class \code{\link{classiKnn}}.
+fdataTransform = function(grid, nderiv, derived, evenly.spaced,
+                          no.missing, deriv.method, ...) {
   if((derived | nderiv == 0L) & evenly.spaced & no.missing) {
     # original data can be used if no derivation or filling of missing values
     # or respacing is necessary
     return(function(fdata) fdata)
+  } else if (evenly.spaced & no.missing & deriv.method == "base.diff") {
+    # fast derivation using base::diff
+    return(function(fdata) {
+      for(i in 1:nderiv) {
+        fdata = t(apply(fdata, 1, diff))
+      }
+      fdata
+    })
   } else {
     # create a preprocessing function
-    function(fdata){
+    return(function(fdata){
       # get basis representation, fill NAs and derive the data
-      fda.fdata = fda::Data2fd(argvals = grid, t(fdata))
+      fda.fdata = fda::Data2fd(argvals = grid, t(fdata), ...)
       if (!(derived | nderiv == 0L)) {
         fda.fdata = fda::deriv.fd(fda.fdata, nderiv = nderiv)
         # print("Derive")
@@ -175,8 +207,8 @@ fdataTransform = function(fdata, grid, nderiv, derived, evenly.spaced, no.missin
       fda.fdata = fda::eval.fd(evalarg = seq(grid[1], grid[length(grid)],
                                              length.out = length(grid)),
                                fdobj = fda.fdata)
-      return(t(fda.fdata))
-    }
+      t(fda.fdata)
+    })
   }
 }
 

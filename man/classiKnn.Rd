@@ -5,8 +5,8 @@
 \title{Create a knn estimator for functional data.}
 \usage{
 classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
-  metric = "Euclidean", nderiv = 0L, derived = FALSE, own.metric = NULL,
-  ...)
+  metric = "Euclidean", nderiv = 0L, derived = FALSE,
+  deriv.method = "base.diff", own.metric = NULL, ...)
 }
 \arguments{
 \item{classes}{[\code{factor(nrow(fdata))}]\cr
@@ -62,6 +62,15 @@ Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
 which will lead to numerical derivation if \code{nderiv >= 1L} by applying
 \code{\link[fda]{deriv.fd}} on a \code{\link[fda]{Data2fd}} representation of
 \code{fdata}.}
+
+\item{deriv.method}{[\code{character(1)}]\cr
+character indicate which method should be used for derivation. Currently
+implemented are \code{"base.diff"}, the default, and \code{"fda.deriv.fd"}.
+\code{"base.diff"} uses the method \code{base::\link[base]{diff}} for equidistant measures
+without missing values, which is faster than transforming the data into the
+class \code{\link[fda]{fd}} and deriving this using \code{fda::\link[fda]{deriv.fd}}.
+The second variant implies smoothing, which can be preferable for calculating
+high order derivatives.}
 
 \item{own.metric}{[\code{function(x, y, ...)}]\cr
 returning a distance matrix with dimensions \code{nrow(x)} x \code{nrow(y)}.
