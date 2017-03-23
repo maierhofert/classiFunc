@@ -45,3 +45,44 @@ test_that("classiKnn works for phoneme data set from fda.usc package", {
   checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(phoneme[["classtest"]]))
 
 })
+
+
+test_that("classiKnn works for custom semimetrics", {
+  data("ArrowHead")
+  classes = ArrowHead[,"target"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
+  test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
+
+  ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
+
+
+  # custom metric with additional parameters
+  myMinkowski = function(x, y, lp) {
+    return(sum(abs(x - y) ^ lp) ^ (1 / lp))
+  }
+
+  # create the models
+  mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "custom.metric")
+  mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "custom.metric", custom.metric = myMinkowski, lp = 2)
+  mod2.error = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "custom.metric", custom.metric = myMinkowski)
+  mod3 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "Minkowski", p = 2)
+
+
+  # get the model predictions
+  pred1 = predict(mod1, newdata = ArrowHead[train_inds,], predict.type = "response")
+  pred2 = predict(mod2, newdata = ArrowHead[train_inds,], predict.type = "response")
+  pred3 = predict(mod3, newdata = ArrowHead[train_inds,], predict.type = "response")
+
+  # check the model predictions
+  expect_error(predict(mod2.error, newdata = ArrowHead[train_inds,], predict.type = "response"))
+  expect_equal(pred1, pred2)
+  expect_equal(pred1, pred3)
+  expect_equal(pred2, pred3)
+
+})

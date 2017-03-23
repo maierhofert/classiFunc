@@ -80,8 +80,10 @@ The second variant implies smoothing, which can be preferable for calculating
 high order derivatives.}
 
 \item{custom.metric}{[\code{function(x, y, ...)}]\cr
-function returning the numeric distance between functional observations
-\code{x} and \code{y}. The default is the Euclidean distance.
+only used if \code{deriv.method = "custom.method"}.
+A function of functional observations
+\code{x} and \code{y} returning their distance.
+The default is the Euclidean distance.
 See how to implement your distance function in \code{\link[proxy]{dist}}}
 
 \item{...}{further arguments to and from other methods. Especially to
@@ -89,8 +91,8 @@ See how to implement your distance function in \code{\link[proxy]{dist}}}
 }
 \value{
 \code{classiKnn} returns an object of class \code{"classiKnn"}. \cr
-An object of class \code{"classiKnn"} is a  list containing the following
-components:
+An object of class \code{"classiKnn"} is a  list containing  at least the
+following components:
  \describe{
   \item{\code{call}}{the original function call.}
   \item{\code{classes}}{a factor of length nrow(fdata) coding the response of
