@@ -42,7 +42,6 @@ test_that("computeDistMat works for all specified metrics", {
 test_that("computeDistMat works for own metric", {
   set.seed(123)
   dat = matrix(rnorm(n = 20), 5, byrow = TRUE)
-  mets = metric.choices()
 
   # default
   distMat = computeDistMat(x = dat, method = "custom.metric")
@@ -56,11 +55,13 @@ test_that("computeDistMat works for own metric", {
   expect_equal(distMat2, distManhattan)
 
   # custom metric with additional parameters
-  # myMinkowski
-  # TODO
-
-
-
+  myMinkowski = function(x, y, lp) {
+    return(sum(abs(x - y) ^ lp) ^ (1 / lp))
+  }
+  distMat3 = computeDistMat(x = dat, method = "custom.metric",
+                            custom.metric = myMinkowski, lp = 3)
+  distMinkowski = computeDistMat(x = dat, method = "Minkowski", p = 3)
+  expect_equal(distMat3, distMinkowski)
 
 
   # Bhjattacharyya, Kullback Leibler and Hellinger are for distributions

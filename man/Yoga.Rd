@@ -4,7 +4,7 @@
 \name{Yoga}
 \alias{Yoga}
 \title{Yoga poses of two actors}
-\format{An object of class \code{data.frame} with 3300 rows and 427 columns.}
+\format{An object of class \code{data.frame} with 3300 rows and 426 columns.}
 \source{
 \url{http://www.timeseriesclassification.com/description.php?Dataset=Yoga}
 }

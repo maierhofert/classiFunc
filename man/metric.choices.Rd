@@ -4,9 +4,17 @@
 \alias{metric.choices}
 \title{Name all metrics}
 \usage{
-metric.choices()
+metric.choices(proxy.only = FALSE)
+}
+\arguments{
+\item{proxy.only}{[logical(1)]\cr
+should only the metrics of the proxy package be returned? Defaults to
+\code{FALSE}, which results in returning the names of all allowed metrics
+for \code{\link{computeDistMat}}.}
 }
 \description{
-\code{metric.choices} is a function returning all (semi-)metrics that are
-currently implemented in the \code{link{classiFunc}}-package.
+\code{metric.choices} is a function returning the names of  all
+(semi-)metrics that are currently implemented in the
+\code{link{classiFunc}}-package and can be used for the argument
+\code{method} in \code{\link{computeDistMat}}.
 }

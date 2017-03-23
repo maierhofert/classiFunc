@@ -1,18 +1,29 @@
 # global function naming all implemented (semi-)metrics
 #' Name all metrics
 #'
-#' \code{metric.choices} is a function returning all (semi-)metrics that are
-#' currently implemented in the \code{link{classiFunc}}-package.
+#' \code{metric.choices} is a function returning the names of  all
+#' (semi-)metrics that are currently implemented in the
+#' \code{link{classiFunc}}-package and can be used for the argument
+#' \code{method} in \code{\link{computeDistMat}}.
+#'
+#' @param proxy.only [logical(1)]\cr
+#'     should only the metrics of the proxy package be returned? Defaults to
+#'     \code{FALSE}, which results in returning the names of all allowed metrics
+#'     for \code{\link{computeDistMat}}.
 #'
 #' @export
-metric.choices = function() {
+metric.choices = function(proxy.only = FALSE) {
   proxy.list = proxy::pr_DB$get_entries()
   is.metric = unlist(BBmisc::extractSubList(proxy.list, element = "type")) == "metric"
   proxy.metric.names = unlist(BBmisc::extractSubList(proxy.list[is.metric], element = "names"))
-  return(c(proxy.metric.names,
-  "shortEuclidean", "mean", "relAreas",
-  "jump", "globMax", "globMin",
-  "points", "custom.metric"))
+  if (proxy.only) {
+    return(proxy.metric.names)
+  } else {
+    return(c(proxy.metric.names,
+             "shortEuclidean", "mean", "relAreas",
+             "jump", "globMax", "globMin",
+             "points", "custom.metric"))
+  }
 }
 
 #' @title Compute a distance matrix for functional observations
@@ -31,6 +42,10 @@ metric.choices = function() {
 #'     \code{method = "jump"}.
 #' @param .poi integer vector giving the indizes of the points of interest for
 #'     \code{method = "points"}.
+#' @param custom.metric a function specifying how to compute the distance between
+#'     two functional observations (= numeric vectors of the same length)
+#'     \code{x} and \code{y}. It can handle additional arguments. The default
+#'     is the Euclidean distance (equals Minkwoski distance with \code{lp = 2}).
 #' @param ... additional parameters to the (semi-)metrics.
 #'
 #' @export
@@ -41,15 +56,15 @@ computeDistMat = function(x, y = NULL,
                           dmin2 = 1L, dmax2 = ncol(x),
                           t1 = 1L, t2 = ncol(x),
                           .poi = 1:ncol(x),
-                          custom.metric = function(x, y, ...) {
-                            return(sqrt(sum((x - y)^2)))},
+                          custom.metric = function(x, y, lp = 2, ...) {
+                            return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
                           ...) {
   # print(method)
-  requirePackages("proxy")
+  # requirePackages("proxy")
 
   assertChoice(method, choices = metric.choices())
 
-  if(method %in% proxy.set) {
+  if(method %in% metric.choices(proxy.only = TRUE)) {
     return(as.matrix(proxy::dist(x, y, method = method, ...)))
   }
 
@@ -110,7 +125,7 @@ computeDistMat = function(x, y = NULL,
   }
 
   if(method == "points") {
-    assertIntegerish(poi, lower = 1L, upper = ncol(x), any.missing = FALSE,
+    assertIntegerish(.poi, lower = 1L, upper = ncol(x), any.missing = FALSE,
                      min.len = 1L, max.len = ncol(x), unique = TRUE)
     return(computeDistMat(x[,.poi], y[,.poi], method = "Manhattan"))
   }

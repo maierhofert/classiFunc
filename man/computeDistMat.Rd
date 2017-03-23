@@ -7,8 +7,8 @@
 computeDistMat(x, y = NULL, method = "Euclidean", dmin = 1L,
   dmax = ncol(x), dmin1 = 1L, dmax1 = ncol(x), dmin2 = 1L,
   dmax2 = ncol(x), t1 = 1L, t2 = ncol(x), .poi = 1:ncol(x),
-  custom.metric = function(x, y, ...) {     return(sqrt(sum((x - y)^2))) },
-  ...)
+  custom.metric = function(x, y, lp = 2, ...) {     return(sum(abs(x -
+  y)^lp)^(1/lp)) }, ...)
 }
 \arguments{
 \item{x}{matrix containing observations as rows}
@@ -26,6 +26,11 @@ on the domain of \code{x}, used in different (semi-)metrics.}
 
 \item{.poi}{integer vector giving the indizes of the points of interest for
 \code{method = "points"}.}
+
+\item{custom.metric}{a function specifying how to compute the distance between
+two functional observations (= numeric vectors of the same length)
+\code{x} and \code{y}. It can handle additional arguments. The default
+is the Euclidean distance (equals Minkwoski distance with \code{lp = 2}).}
 
 \item{...}{additional parameters to the (semi-)metrics.}
 }
