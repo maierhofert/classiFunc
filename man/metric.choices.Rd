@@ -16,5 +16,7 @@ for \code{\link{computeDistMat}}.}
 \code{metric.choices} is a function returning the names of  all
 (semi-)metrics that are currently implemented in the
 \code{link{classiFunc}}-package and can be used for the argument
-\code{method} in \code{\link{computeDistMat}}.
+\code{method} in \code{\link{computeDistMat}} or the argument
+\code{metric} in \code{\link{classiKnn}} and \code{\link{classiKernel}}
+respectively.
 }

@@ -15,12 +15,13 @@ Depends:
     R (>= 2.10)
 Suggests:
     testthat,
-    fda.usc,
     knitr,
     rmarkdown
 Imports:
     BBmisc (>= 1.11),
     checkmate (>= 1.8.2),
     fda,
-    proxy
+    fda.usc,
+    proxy,
+    stats
 VignetteBuilder: knitr

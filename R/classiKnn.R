@@ -1,13 +1,15 @@
 
-#' @title Create a knn estimator for functional data.
+#' @title Create a knn estimator for functional data classification.
 #'
-#' @description Creates an efficient knn estimator for functional data. Currently
-#' supported distance measures are all \code{metrics} implemented in \code{\link[proxy]{dist}}
+#' @description Creates an efficient knn estimator for functional data
+#' classification. Currently supported distance measures are all \code{metrics}
+#' implemented in \code{\link[proxy]{dist}}
 #' and all semimetrics suggested in
 #' Fuchs etal. 2015, Nearest neighbor ensembles for functional data with
 #' interpretable feature selection,
 #' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100})
 #' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
+#'
 #' @param classes [\code{factor(nrow(fdata))}]\cr
 #'   factor of length \code{nrow(fdata)} containing the classes of the observations.
 #' @param fdata [\code{matrix}]\cr
@@ -78,8 +80,8 @@
 #' @param ...
 #' further arguments to and from other methods. Especially to
 #' \code{\link{fdataTransform}} and \code{\link{computeDistMat}}.
-#' @return \code{classiKnn} returns an object of class \code{"classiKnn"}. \cr
-#' An object of class \code{"classiKnn"} is a  list containing  at least the
+#' @return \code{classiKnn} returns an object of class \code{"classiKnn"}.
+#' This is a  list containing  at least the
 #' following components:
 #'  \describe{
 #'   \item{\code{call}}{the original function call.}
@@ -105,6 +107,7 @@
 #'   missing values) is done in the exact same way for the original
 #'   training data set and future (test) data sets.}
 #'  }
+#'
 #' @importFrom fda Data2fd deriv.fd eval.fd
 #' @examples
 #' # Classification of the Phoneme data
@@ -138,17 +141,14 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
     fdata = as.matrix(fdata)
   assert_numeric(fdata)
   assertClass(fdata, "matrix")
-
-  if(is.numeric(classes))
+ if(is.numeric(classes))
     classes = factor(classes)
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
-
-  proxy.set = unlist(summary(proxy::pr_DB)$names)
-  assertChoice(metric, choices = c(proxy.set,
-                                   "shortEuclidean", "mean", "relAreas",
-                                   "jump", "globMax", "globMin",
-                                   "points", "custom.metric"))
+  assertIntegerish(knn, lower = 1L, upper = nrow(fdata), len = 1)
+  assertChoice(metric, choices = metric.choices())
+  assertIntegerish(nderiv, lower = 0L)
+  assertFlag(derived)
   assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
 
   # check if data is evenly spaced  -> respace
@@ -173,8 +173,7 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   if (metric != "custom.metric")
     custom.metric = character(0)
 
-  ret = list(call = as.list(match.call(expand.dots = FALSE)),
-             classes = classes,
+  ret = list(classes = classes,
              fdata = fdata,
              proc.fdata = proc.fdata,
              grid = grid,
@@ -182,58 +181,12 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
              metric = metric,
              custom.metric = custom.metric,
              nderiv = nderiv,
-             this.fdataTransform = this.fdataTransform)
+             this.fdataTransform = this.fdataTransform,
+             call = as.list(match.call(expand.dots = FALSE)))
   class(ret) = "classiKnn"
 
   return(ret)
 }
-
-
-#' @title Create a preprocessing pipeline function
-#'
-#' @description internal function, documented due to the importance of its
-#' concept. Creates a pipeline function to do all the
-#' preprocessing needed in \code{\link{classiKnn}}. This is helpful to ensure,
-#' that the data preprocessing is carried out in exactly the same way for the
-#' train and the test set in \code{predict.classiKnn}.
-#'
-#' @param grid,nderiv,derived,evenly.spaced,no.missing,deriv.method see
-#' \code{\link{classiKnn}}
-#' @param ... additional arguments to fda::Data2fd
-#' @return pipeline function taking one argument \code{fdata}. The returned
-#' function carries out all the preprocessing needed for the calling model
-#' of class \code{\link{classiKnn}}.
-fdataTransform = function(grid, nderiv, derived, evenly.spaced,
-                          no.missing, deriv.method, ...) {
-  if((derived | nderiv == 0L) & evenly.spaced & no.missing) {
-    # original data can be used if no derivation or filling of missing values
-    # or respacing is necessary
-    return(function(fdata) fdata)
-  } else if (evenly.spaced & no.missing & deriv.method == "base.diff") {
-    # fast derivation using base::diff
-    return(function(fdata) {
-      for(i in 1:nderiv) {
-        fdata = t(apply(fdata, 1, diff))
-      }
-      fdata
-    })
-  } else {
-    # create a preprocessing function
-    return(function(fdata){
-      # get basis representation, fill NAs and derive the data
-      fda.fdata = fda::Data2fd(argvals = grid, t(fdata), ...)
-      if (!(derived | nderiv == 0L)) {
-        fda.fdata = fda::deriv.fd(fda.fdata, nderiv = nderiv)
-        # print("Derive")
-      }
-      fda.fdata = fda::eval.fd(evalarg = seq(grid[1], grid[length(grid)],
-                                             length.out = length(grid)),
-                               fdobj = fda.fdata)
-      t(fda.fdata)
-    })
-  }
-}
-
 
 
 #' @export
@@ -251,8 +204,8 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
   # note, that additional arguments from the original model are handed over
   # to computeDistMat using object$call$...
   dist.mat = do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
-                                         method = object$metric,
-                                         custom.metric = object$custom.metric, ...),
+                                              method = object$metric,
+                                              custom.metric = object$custom.metric, ...),
                                          object$call$...))
 
   # matrix containing which nearest neighbor the training observation is
@@ -273,5 +226,3 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
   }
   return(result)
 }
-
-
