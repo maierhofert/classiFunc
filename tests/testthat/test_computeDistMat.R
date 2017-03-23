@@ -64,4 +64,3 @@ test_that("computeDistMat works for custom metrics", {
   expect_equal(distMat3, distMinkowski)
 
 })
-

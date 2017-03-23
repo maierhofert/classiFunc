@@ -86,3 +86,38 @@ test_that("classiKnn works for custom semimetrics", {
   expect_equal(pred2, pred3)
 
 })
+
+test_that("classiKnn works for newly implemented semimetrics", {
+  data("ArrowHead")
+  classes = ArrowHead[,"target"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
+  test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
+
+  ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
+
+
+  # create the models
+  mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "globMax")
+  mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "points")
+  mod3 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "points", .poi = 5:10)
+
+  # get the model predictions
+  pred1 = predict(mod1, newdata = ArrowHead[train_inds,], predict.type = "response")
+  pred2 = predict(mod2, newdata = ArrowHead[train_inds,], predict.type = "response")
+  pred3 = predict(mod3, newdata = ArrowHead[train_inds,], predict.type = "response")
+
+  # check the model predictions
+  expect_factor(pred1, len = length(train_inds), any.missing = FALSE,
+                levels = levels(classes[train_inds]))
+  expect_factor(pred2, len = length(train_inds), any.missing = FALSE,
+                levels = levels(classes[train_inds]))
+  expect_factor(pred3, len = length(train_inds), any.missing = FALSE,
+                levels = levels(classes[train_inds]))
+  expect_false(all(pred2 == pred3))
+
+})
