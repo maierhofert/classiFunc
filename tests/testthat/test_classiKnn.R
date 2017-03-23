@@ -102,9 +102,9 @@ test_that("classiKnn works for newly implemented semimetrics", {
   mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
                    metric = "globMax")
   mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-                   metric = "points")
+                   metric = "points", knn = 5)
   mod3 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-                   metric = "points", .poi = 5:10)
+                   metric = "points", knn = 5, .poi = 5:7)
 
   # get the model predictions
   pred1 = predict(mod1, newdata = ArrowHead[train_inds,], predict.type = "response")
