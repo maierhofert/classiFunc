@@ -12,6 +12,8 @@
 #' @return pipeline function taking one argument \code{fdata}. The returned
 #' function carries out all the preprocessing needed for the calling model
 #' of class \code{\link{classiKnn}}.
+#'
+#' @export
 fdataTransform = function(grid, nderiv, derived, evenly.spaced,
                           no.missing, deriv.method, ...) {
   if((derived | nderiv == 0L) & evenly.spaced & no.missing) {

@@ -78,8 +78,13 @@
 #' The default is the Euclidean distance.
 #' See how to implement your distance function in \code{\link[proxy]{dist}}
 #' @param ...
-#' further arguments to and from other methods. Especially to
-#' \code{\link{fdataTransform}} and \code{\link{computeDistMat}}.
+#' further arguments to and from other methods. Hand over additional arguments to
+#' \code{\link{computeDistMat}}, usually additional arguments for the specified
+#' (semi-)metric. Also, if \code{deriv.method == "fda.deriv.fd"} or
+#' \code{fdata} is not observed on a regular grid, additional arguments to
+#' \code{\link{fdataTransform}} can be specified which will be passed on to
+#' \code{\link[fda]{Data2fd}}.
+#'
 #' @return \code{classiKnn} returns an object of class \code{"classiKnn"}.
 #' This is a  list containing  at least the
 #' following components:
