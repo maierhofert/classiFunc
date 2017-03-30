@@ -8,29 +8,56 @@ computeDistMat(x, y = NULL, method = "Euclidean", dmin = 1L,
   dmax = ncol(x), dmin1 = 1L, dmax1 = ncol(x), dmin2 = 1L,
   dmax2 = ncol(x), t1 = 1L, t2 = ncol(x), .poi = 1:ncol(x),
   custom.metric = function(x, y, lp = 2, ...) {     return(sum(abs(x -
-  y)^lp)^(1/lp)) }, ...)
+  y)^lp)^(1/lp)) }, a = NULL, b = NULL, c = NULL, lambda = 0, ...)
 }
 \arguments{
-\item{x}{matrix containing observations as rows}
+\item{x}{[\code{matrix}]\cr
+matrix containing observations as rows}
 
-\item{y}{see \code{x}. The default \code{NULL} uses \code{y = x}.}
+\item{y}{[\code{matrix}]\cr
+see \code{x}. The default \code{NULL} uses \code{y = x}.}
 
-\item{method}{character string specifying the (semi-)metric to be used.
-on the domain of \code{x}, used in different (semi-)metrics.}
+\item{method}{[\code{character(1)}]\cr
+character string specifying the (semi-)metric to be used.
+on the domain of \code{x}.}
 
-\item{dmin, dmax, dmin1, dmax1, dmin2, dmax2}{indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}}
+\item{dmin, dmax, dmin1, dmax1, dmin2, dmax2}{[\code{integer(1)}]\cr
+indizes used to define subspaces for
+\code{method \%in\% c("shortEuclidean", "relAreas")}.}
 
-\item{t1, t2}{indizes of the points for which to compare the jump heights in
+\item{t1, t2}{[\code{integer(1)}]\cr
+indizes of the points for which to compare the jump heights in
 \code{method = "jump"}.}
 
-\item{.poi}{integer vector giving the indizes of the points of interest for
+\item{.poi}{[\code{integer(1 to ncol(x))}]\cr
+integer vector giving the indizes of the points of interest for
 \code{method = "points"}.}
 
-\item{custom.metric}{a function specifying how to compute the distance between
+\item{custom.metric}{[\code{function(x, y, ...)}]\cr
+a function specifying how to compute the distance between
 two functional observations (= numeric vectors of the same length)
-\code{x} and \code{y}. It can handle additional arguments. The default
-is the Euclidean distance (equals Minkwoski distance with \code{lp = 2}).}
+\code{x} and \code{y}. It can handle additional arguments in \code{...}.
+The default is the Euclidean distance (equals Minkwoski distance
+with \code{lp = 2}). Used if \code{method = "custom.metric"}.}
+
+\item{a, b, c}{[\code{numeric(1)}]\cr
+the penalization parameters used in the elastic distance of the
+sqare root velocity of the curves.
+\code{a} and \code{b} specify the weight of the integrals measuring
+the amount of bending and stretching. The stretching (movement in x) is
+penalized by \code{a^2}, the bending (movement in y) is penalized by \code{b^2}.
+Alternatively, the argument \code{c} can be specified, where
+\code{c = b / (2a)}, as the resulting metric is only influenced by
+the ratio of \code{a} and \code{b}.
+Default values are \code{a = 1/2, b = 1}.
+Used for \code{method \%in\% c('elastic', 'SRV')}}
+
+\item{lambda}{[\code{numeric(1)}]\cr
+penalization parameter for the warping allowed before calculating the
+elastic distance.
+Default value is 0. Large values imply less (no) warping, small values
+imply more warping.
+Used for \code{method \%in\% c('elastic', 'SRV')}.}
 
 \item{...}{additional parameters to the (semi-)metrics.}
 }

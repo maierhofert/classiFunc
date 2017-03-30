@@ -58,7 +58,17 @@ character string describing the distance function to be used.
   distance.}
   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
   own distance function in the argument \code{custom.metric}}
- }}
+  \item{\code{elastic, SRV}}{the elastic distance of the square root velocity
+  of the curves as described in
+  Srivastava etal 2011, 'Shape analysis of elastic curves in Euclidean spaces'
+  and implemented in \code{\link[fdasrvf]{elastic.distance}}.
+  Additional argument are the numeric the penalization parameters \code{a,b,c}
+  for the amount of bending (\code{a^2}) and stretching (\code{b^2}).
+  The default values are \code{a = 1/2, b = 1}
+  Alternatively \code{c} denotes the ratio of \code{2*a} and \code{b}.
+  \code{lambda} is the additional penalization parameter for the warping
+  allowed before calculating the elastic distance. The default is 0.
+ }}}
 
 \item{nderiv}{[\code{integer(1)}]\cr
 The order of derivation on which the metric shall be computed.

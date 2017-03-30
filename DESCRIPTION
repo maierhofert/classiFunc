@@ -20,8 +20,10 @@ Suggests:
 Imports:
     BBmisc (>= 1.11),
     checkmate (>= 1.8.2),
+    dtw,
     fda,
     fda.usc,
+    fdasrvf,
     proxy,
     stats
 VignetteBuilder: knitr

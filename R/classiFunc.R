@@ -14,6 +14,10 @@
 #' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 #'
 #' @import BBmisc checkmate proxy
+#' @importFrom fda Data2fd deriv.fd eval.fd
+#' @importFrom fdasrvf elastic.distance
+#' @import dtw
+#'
 #' @rdname classiFunc
 #' @name classiFunc
 NULL
