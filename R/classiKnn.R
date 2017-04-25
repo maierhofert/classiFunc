@@ -227,18 +227,18 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
 
   # matrix containing which nearest neighbor the training observation is
   # for the new observation
-  nn.mat = apply(dist.mat, 2, order)
+  nn.mat = apply(dist.mat, 2, rank)
 
 
   if (predict.type == "response") {
     result = apply(nn.mat, 2, function(x) {
-      names(which.max(table(object$classes[x][1:object$knn])))
+      names(which.max(table(object$classes[x <= object$knn])))
     })
     result = factor(result, levels = levels(object$classes))
   } else {
     # probabilities for the classes
     result = t(apply(nn.mat, 2, function(x) {
-      table(object$classes[x][1:object$knn]) / object$knn
+      table(object$classes[x <= object$knn]) / object$knn
     }))
   }
   return(result)
