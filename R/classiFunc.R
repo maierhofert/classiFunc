@@ -15,7 +15,7 @@
 #'
 #' @import BBmisc checkmate proxy
 #' @importFrom fda Data2fd deriv.fd eval.fd
-#' @importFrom fdasrvf elastic.distance
+#' @importFrom fdasrvf elastic.distance f_to_srvf
 #' @import dtw
 #'
 #' @rdname classiFunc

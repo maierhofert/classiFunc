@@ -25,6 +25,8 @@ metric.choices = function(proxy.only = FALSE) {
              "shortEuclidean", "mean", "relAreas",
              "jump", "globMax", "globMin",
              "points", "custom.metric",
-             "SRV", "elastic"))
+             "amplitudeDistance", "phaseDistance",
+             "FisherRao", "elasticMetric",
+             "elasticDistance"))
   }
 }

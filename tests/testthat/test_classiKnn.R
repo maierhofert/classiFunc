@@ -168,7 +168,7 @@ test_that("classiKnn works with elastic distance from the square root velocity f
   ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
 
   mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-                   metric = "elastic", lambda = Inf)
+                   metric = "elasticDistance", lambda = Inf)
   # mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
   #                  metric = "elastic", a = 1, b = 2, lambda = Inf)
 

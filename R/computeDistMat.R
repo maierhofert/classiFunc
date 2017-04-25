@@ -138,9 +138,31 @@ computeDistMat = function(x, y = NULL,
     return(as.matrix(proxy::dist(x, y, method = dtwPath, ...)))
   }
 
+  # Metrics from the SRV framework
+  # amplitude distance
+  if(method %in% c("amplitudeDistance")) {
+    return(computeDistMat(x, y, method = "elasticDistance",
+                          a = 1, b = 0, lambda = lambda))
+  }
+  # phase distance
+  if(method %in% c("phaseDistance")) {
+    return(computeDistMat(x, y, method = "elasticDistance",
+                          a = 0, b = 1, lambda = lambda))
+  }
+  # TODO check if this is mathematically correct
+  # Fisher-Rao metric
+  if(method %in% c("FisherRao", "elasticMetric")) {
+    q1 = fdasrvf::f_to_srvf(t(x), time = 1:nrow(x))
+    q2 = fdasrvf::f_to_srvf(t(y), time = 1:nrow(x))
+    return(computeDistMat(t(q1), t(q2), method = "Euclidean"))
+  }
   # elastic distance from the square root velocity framework,
   # see Srivastava etal 2011
-  if(method %in% c("elastic", "SRV")) {
+  # I do not know how this is related to the elastic metric,
+
+
+  # it returns the phase and the amplitude distance
+  if(method %in% c("elasticDistance")) {
     # input checking
     assertNumeric(a, lower = 0, len = 1L, null.ok = TRUE)
     assertNumeric(b, lower = 0, len = 1L, null.ok = TRUE)
