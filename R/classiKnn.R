@@ -232,13 +232,13 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
 
   if (predict.type == "response") {
     result = apply(nn.mat, 2, function(x) {
-      names(which.max(table(object$classes[x <= object$knn])))
+      names(which.max(table(object$classes[x < object$knn + 1])))
     })
     result = factor(result, levels = levels(object$classes))
   } else {
     # probabilities for the classes
     result = t(apply(nn.mat, 2, function(x) {
-      table(object$classes[x <= object$knn]) / object$knn
+      table(object$classes[x < object$knn + 1]) / object$knn
     }))
   }
   return(result)

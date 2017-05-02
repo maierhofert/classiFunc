@@ -12,14 +12,20 @@
 #'     character string specifying the (semi-)metric to be used.
 #'     on the domain of \code{x}.
 #' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 [\code{integer(1)}]\cr
-#'     indizes used to define subspaces for
-#'     \code{method \%in\% c("shortEuclidean", "relAreas")}.
-#' @param t1,t2 [\code{integer(1)}]\cr
-#'     indizes of the points for which to compare the jump heights in
-#'     \code{method = "jump"}.
-#' @param .poi [\code{integer(1 to ncol(x))}]\cr
-#'     integer vector giving the indizes of the points of interest for
-#'     \code{method = "points"}.
+#'     encode the indizes used to define subspaces for
+#'     \code{method \%in\% c("shortEuclidean", "relAreas")}
+#'     as numeric values between 0 and 1 by
+#'     \code{index = round(quantile(1:ncol(x), probs = dmin))}.
+#' @param t1,t2 [\code{numeric(1)}]\cr
+#'     encode the index of the points for which to compare the jump heights in
+#'     \code{method = "jump"} as numeric values between 0 and 1 by
+#'     \code{index = round(quantile(1:ncol(x), probs = t1))}.
+#' @param .poi [\code{numeric(1 to ncol(x))}]\cr
+#'     numeric vector of length between 1 and \code{ncol(x)} taking numeric values
+#'     between 0 and 1, denoting the
+#'     index of the points of interest by
+#'     \code{index = round(quantile(1:ncol(x), probs = .poi))}
+#'     for \code{method = "points"}.
 #' @param custom.metric [\code{function(x, y, ...)}]\cr
 #'     a function specifying how to compute the distance between
 #'     two functional observations (= numeric vectors of the same length)
@@ -27,16 +33,9 @@
 #'     The default is the Euclidean distance (equals Minkwoski distance
 #'     with \code{lp = 2}). Used if \code{method = "custom.metric"}.
 #' @param a,b,c [\code{numeric(1)}]\cr
-#'     the penalization parameters used in the elastic distance of the
-#'     sqare root velocity of the curves.
-#'     \code{a} and \code{b} specify the weight of the integrals measuring
-#'     the amount of bending and stretching. The stretching (movement in x) is
-#'     penalized by \code{a^2}, the bending (movement in y) is penalized by \code{b^2}.
-#'     Alternatively, the argument \code{c} can be specified, where
-#'     \code{c = b / (2a)}, as the resulting metric is only influenced by
-#'     the ratio of \code{a} and \code{b}.
-#'     Default values are \code{a = 1/2, b = 1}.
-#'     Used for \code{method \%in\% c('elastic', 'SRV')}
+#'     weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
+#'     in a semimetric that combines them by addition.
+#'     Used for \code{method == 'elasticDistance'}.
 #' @param lambda [\code{numeric(1)}]\cr
 #'     penalization parameter for the warping allowed before calculating the
 #'     elastic distance.
@@ -49,11 +48,11 @@
 #' @export
 computeDistMat = function(x, y = NULL,
                           method = "Euclidean",
-                          dmin = 1L, dmax = ncol(x),
-                          dmin1 = 1L, dmax1 = ncol(x),
-                          dmin2 = 1L, dmax2 = ncol(x),
-                          t1 = 1L, t2 = ncol(x),
-                          .poi = 1:ncol(x),
+                          dmin = 0, dmax = 1,
+                          dmin1 = 0, dmax1 = 1,
+                          dmin2 = 0, dmax2 = 1,
+                          t1 = 0, t2 = 1,
+                          .poi = seq(0, 1, length.out = ncol(x)),
                           custom.metric = function(x, y, lp = 2, ...) {
                             return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
                           a = NULL, b = NULL, c = NULL, lambda = 0,
@@ -75,10 +74,15 @@ computeDistMat = function(x, y = NULL,
   if(is.null(y)) y = x
 
   if(method == "shortEuclidean") {
-    assertIntegerish(dmin, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
-    assertIntegerish(dmax, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
+    assertNumeric(dmin, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+    assertNumeric(dmax, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     stopifnot(dmin <= dmax)
-    return(computeDistMat(x[,dmin:dmax], y[,dmin:dmax], "Euclidean"))
+
+    # convert to index
+    dmin = round(quantile(1:ncol(x), probs = dmin))
+    dmax = round(quantile(1:ncol(x), probs = dmax))
+    return(computeDistMat(x[,dmin:dmax],
+                          y[,dmin:dmax], "Euclidean"))
   }
 
   if(method == "mean") {
@@ -86,12 +90,18 @@ computeDistMat = function(x, y = NULL,
   }
 
   if(method == "relAreas") {
-    assertIntegerish(dmin1, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
-    assertIntegerish(dmax1, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
-    assertIntegerish(dmin2, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
-    assertIntegerish(dmin2, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
+    assertNumeric(dmin1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+    assertNumeric(dmax1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+    assertNumeric(dmin2, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+    assertNumeric(dmax2, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     stopifnot(dmin1 <= dmax1)
     stopifnot(dmin2 <= dmax2)
+
+    # convert to index
+    dmin1 = round(quantile(1:ncol(x), probs = dmin1))
+    dmax1 = round(quantile(1:ncol(x), probs = dmax1))
+    dmin2 = round(quantile(1:ncol(x), probs = dmin2))
+    dmax2 = round(quantile(1:ncol(x), probs = dmax2))
 
     relArea.x = abs(rowMeans(x[,dmin1:dmax1]) /  rowMeans(x[,dmin2:dmax2]))
     relArea.y = abs(rowMeans(y[,dmin1:dmax1]) /  rowMeans(y[,dmin2:dmax2]))
@@ -99,8 +109,12 @@ computeDistMat = function(x, y = NULL,
   }
 
   if(method == "jump") {
-    assertIntegerish(t1, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
-    assertIntegerish(t2, lower = 1L, upper = ncol(x), len = 1L, any.missing = FALSE)
+    assertNumeric(t1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+    assertNumeric(t2, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
+
+    # convert to index
+    t1 = round(quantile(1:ncol(x), probs = t1))
+    t2 = round(quantile(1:ncol(x), probs = t2))
 
     jump.x = x[,t2] - x[,t1]
     jump.y = y[,t2] - y[,t1]
@@ -122,8 +136,11 @@ computeDistMat = function(x, y = NULL,
   }
 
   if(method == "points") {
-    assertIntegerish(.poi, lower = 1L, upper = ncol(x), any.missing = FALSE,
+    assertNumeric(.poi, lower = 0, upper = 1, any.missing = FALSE,
                      min.len = 1L, max.len = ncol(x), unique = TRUE)
+    # convert to index
+    .poi = round(quantile(1:ncol(x), probs = .poi))
+
     return(computeDistMat(x[,.poi], y[,.poi], method = "Manhattan"))
   }
 
@@ -161,7 +178,8 @@ computeDistMat = function(x, y = NULL,
   # I do not know how this is related to the elastic metric,
 
 
-  # it returns the phase and the amplitude distance
+  # this method returns the phase and the amplitude distance
+  # I do not know how it relates to the elastic metric
   if(method %in% c("elasticDistance")) {
     # input checking
     assertNumeric(a, lower = 0, len = 1L, null.ok = TRUE)
@@ -174,6 +192,9 @@ computeDistMat = function(x, y = NULL,
                     "The execution continues with your specified value."))
 
     # handling default values
+    # TODO: As I do not know how this relates to the elastic metric,
+    # I do not know if the default values make sense
+    # probably not
     if(is.null(a) & is.null(b) & is.null(c)) {
       c = 1
       a = 0.5

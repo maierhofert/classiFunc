@@ -4,11 +4,11 @@
 \alias{computeDistMat}
 \title{Compute a distance matrix for functional observations}
 \usage{
-computeDistMat(x, y = NULL, method = "Euclidean", dmin = 1L,
-  dmax = ncol(x), dmin1 = 1L, dmax1 = ncol(x), dmin2 = 1L,
-  dmax2 = ncol(x), t1 = 1L, t2 = ncol(x), .poi = 1:ncol(x),
-  custom.metric = function(x, y, lp = 2, ...) {     return(sum(abs(x -
-  y)^lp)^(1/lp)) }, a = NULL, b = NULL, c = NULL, lambda = 0, ...)
+computeDistMat(x, y = NULL, method = "Euclidean", dmin = 0, dmax = 1,
+  dmin1 = 0, dmax1 = 1, dmin2 = 0, dmax2 = 1, t1 = 0, t2 = 1,
+  .poi = seq(0, 1, length.out = ncol(x)), custom.metric = function(x, y, lp
+  = 2, ...) {     return(sum(abs(x - y)^lp)^(1/lp)) }, a = NULL, b = NULL,
+  c = NULL, lambda = 0, ...)
 }
 \arguments{
 \item{x}{[\code{matrix}]\cr
@@ -22,16 +22,22 @@ character string specifying the (semi-)metric to be used.
 on the domain of \code{x}.}
 
 \item{dmin, dmax, dmin1, dmax1, dmin2, dmax2}{[\code{integer(1)}]\cr
-indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}.}
+encode the indizes used to define subspaces for
+\code{method \%in\% c("shortEuclidean", "relAreas")}
+as numeric values between 0 and 1 by
+\code{index = round(quantile(1:ncol(x), probs = dmin))}.}
 
-\item{t1, t2}{[\code{integer(1)}]\cr
-indizes of the points for which to compare the jump heights in
-\code{method = "jump"}.}
+\item{t1, t2}{[\code{numeric(1)}]\cr
+encode the index of the points for which to compare the jump heights in
+\code{method = "jump"} as numeric values between 0 and 1 by
+\code{index = round(quantile(1:ncol(x), probs = t1))}.}
 
-\item{.poi}{[\code{integer(1 to ncol(x))}]\cr
-integer vector giving the indizes of the points of interest for
-\code{method = "points"}.}
+\item{.poi}{[\code{numeric(1 to ncol(x))}]\cr
+numeric vector of length between 1 and \code{ncol(x)} taking numeric values
+between 0 and 1, denoting the
+index of the points of interest by
+\code{index = round(quantile(1:ncol(x), probs = .poi))}
+for \code{method = "points"}.}
 
 \item{custom.metric}{[\code{function(x, y, ...)}]\cr
 a function specifying how to compute the distance between
@@ -41,16 +47,9 @@ The default is the Euclidean distance (equals Minkwoski distance
 with \code{lp = 2}). Used if \code{method = "custom.metric"}.}
 
 \item{a, b, c}{[\code{numeric(1)}]\cr
-the penalization parameters used in the elastic distance of the
-sqare root velocity of the curves.
-\code{a} and \code{b} specify the weight of the integrals measuring
-the amount of bending and stretching. The stretching (movement in x) is
-penalized by \code{a^2}, the bending (movement in y) is penalized by \code{b^2}.
-Alternatively, the argument \code{c} can be specified, where
-\code{c = b / (2a)}, as the resulting metric is only influenced by
-the ratio of \code{a} and \code{b}.
-Default values are \code{a = 1/2, b = 1}.
-Used for \code{method \%in\% c('elastic', 'SRV')}}
+weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
+in a semimetric that combines them by addition.
+Used for \code{method == 'elasticDistance'}.}
 
 \item{lambda}{[\code{numeric(1)}]\cr
 penalization parameter for the warping allowed before calculating the

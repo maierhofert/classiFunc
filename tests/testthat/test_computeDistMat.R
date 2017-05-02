@@ -73,10 +73,10 @@ test_that("computeDistMat works for newly implemented metrics suggested in Fuchs
   # calculate distance matrices
   dist1 = computeDistMat(x = dat, method = "Euclidean")
   dist2 = computeDistMat(x = dat, method = "shortEuclidean")
-  dist3 = computeDistMat(x = dat, method = "shortEuclidean", dmin = 1, dmax = 2)
+  dist3 = computeDistMat(x = dat, method = "shortEuclidean", dmin = 0, dmax = 1)
 
   # custom metric with additional parameters
   expect_true(all(dist1 - dist2 == 0))
-  expect_character(all.equal(dist2, dist3))
+  expect_equal(dist2, dist3)
 
 })

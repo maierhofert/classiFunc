@@ -105,7 +105,7 @@ test_that("classiKnn works for newly implemented semimetrics from Fuchs etal", {
   mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
                    metric = "points", knn = 5)
   mod3 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-                   metric = "points", knn = 5, .poi = 5:7)
+                   metric = "points", knn = 5, .poi = c(0.1, 0.23, 0.713))
 
   # get the model predictions
   pred1 = predict(mod1, newdata = ArrowHead[train_inds,], predict.type = "response")
