@@ -44,7 +44,7 @@
 #'     Used for \code{method \%in\% c('elastic', 'SRV')}.
 #'
 #' @param ... additional parameters to the (semi-)metrics.
-#'
+#' @importFrom stats quantile
 #' @export
 computeDistMat = function(x, y = NULL,
                           method = "Euclidean",
