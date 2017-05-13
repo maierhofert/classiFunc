@@ -8,59 +8,145 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+  
+  This vignette gives a quick introduction to the key features and functions included in the `classiFunc` package. Please use the [Project Page](https://github.com/maierhofert/classiFunc/) to suggest new features or report bugs. This package offers an extensible and efficient implementation of `k` nearest neighbor classification for functional data.
+  
+  The following chunk gives a quick introduction to the usage of the `classiFunc` 
+  package.
+  
+```{r, eval = TRUE, results='asis'}
 
-This vignette gives a quick introduction to the key features and functions included in this package. Please use the [Project Page](https://github.com/maierhofert/classiFunc/) suggest new features or report bugs. This package offers an extensible and efficient implementation of `k` nearest neighbor classification for functional data.
-<!-- All functionality of this package can also be accessed through the `mlr` package -->
-<!-- [Project Page](https://github.com/mlr-org/mlr/). For an introduction on how to use `mlr` check out the [Online Tutorial](https://mlr-org.github.io/mlr-tutorial/). -->
+  library("classiFunc")
+  
+  # classification of the ArrowHead data set
+  data("ArrowHead", package = "classiFunc")
+  classes = ArrowHead[,"target"]
+  
+  set.seed(123)
+  # use 80% of data as training set and 20% as test set
+  train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
+  test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
+  
+  # create functional data as matrix with observations as rows
+  fdata = ArrowHead[,!colnames(ArrowHead) == "target"]
+  
+  # create a k = 3 nearest neighbor classifier with Euclidean distance (default) of the
+  # first order derivative of the data
+  mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
+  nderiv = 1L, knn = 3L)
+  # or create a kernel estimator
+  mod2 = classiKernel(classes = classes[train_inds], fdata = fdata[train_inds,])
+  
+  # predict the model for the test set
+  # matrix with the prediction probabilities for the three classes
+  pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
+  
+```
+  
+  All functionality of this package can also be accessed through the `mlr` package [Project Page](https://github.com/mlr-org/mlr/). For an introduction on how to use `mlr` check out the [Online Tutorial](https://mlr-org.github.io/mlr-tutorial/).
+  Currently, the learners are not merged into the Master branch of `mlr`. If you want
+  to use the development version, please download the package from the 
+  [Project Page](https://github.com/maierhofert//). The following chunck gives a quick introduction on how to use the `classiFunc` learners in `mlr`.
+  
+```{r, eval = FALSE, results='asis'}
 
+# download and install the mlr branch containing the classiFunc learners
+# devtools::install_github("maierhofert/mlr", 
+#                          ref = "fda_pull1_task")
+library("mlr")
 
+# classification of the ArrowHead data set
+data("ArrowHead", package = "classiFunc")
 
+# create the classiKnn learner for classification of functional data
+lrn = makeLearner("fdaclassif.classiKnn")
+# create a task from the training data set
+task = makeFDAClassifTask(data = ArrowHead[train_inds,], target = "target")
+# train the model on the training data task
+m.mlr = train(lrn, task)
 
+# predict the test data set
+pred = predict(m.mlr, newdata = ArrowHead[test_inds,])
+  
+```
+  
+  By using the `mlr` interface for this package, a multitude of new possibilities
+  are  available. One of the key features to be added by the `mlr` package is
+  automatic hyperparameter tuning. In the following chunk a kernel estimator is
+  created that automatically chooses its band width by cross validation.
+  
+```{r, eval = FALSE, results='asis'}
 
-<!-- Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format: -->
+# create the classiKernel learner for classification of functional data
+lrn.kernel = makeLearner("fdaclassif.classiKernel", predict.type = "prob")
 
-<!-- - Never uses retina figures -->
-<!-- - Has a smaller default figure size -->
-<!-- - Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style -->
+# create parameter set
+parSet.bandwidth = makeParamSet(
+  makeNumericParam(id = "h", lower = 0, upper = 10)
+)
 
-<!-- ## Vignette Info -->
+# control for tuning hyper parameters
+# Use higher resolution in application
+ctrl = makeTuneControlGrid(resolution = 11L)
 
-<!-- Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette. -->
+# tuned learners
+lrn.bandwidth.tuned = makeTuneWrapper(learner = lrn.kernel, 
+                                      resampling = makeResampleDesc("CV", iters = 5),
+                                      measures = mmce,
+                                      par.set = parSet.bandwidth,
+                                      control = ctrl)
 
-<!-- ## Styles -->
+# train the model on the training data task
+m = train(lrn.bandwidth.tuned, task)
 
-<!-- The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows: -->
+# predict the test data set
+pred = predict(m, newdata = ArrowHead[test_inds,])
 
-<!--     output:  -->
-<!--       rmarkdown::html_vignette: -->
-<!--         css: mystyles.css -->
+```
 
-<!-- ## Figures -->
+The Brier score optimal ensemble proposed in 
+[Fuchs etal. 2015](http://www.sciencedirect.com/science/article/pii/S0169743915001100),
+Nearest neighbor ensembles for functional data with 
+interpretable feature selection,
+can also be reproduced using the implementation in `mlr`.
+A newly implemented stacked learner aggregates the individual base learners 
+to an ensemble learner by creating a weighted mean of their individual predictions.
+Other ensemble learners can easily created.
 
-<!-- The figure sizes have been customised so that you can easily put two images side-by-side.  -->
+```{r, eval = FALSE, results='asis'}
 
-<!-- ```{r, fig.show='hold'} -->
-<!-- plot(1:10) -->
-<!-- plot(10:1) -->
-<!-- ``` -->
+# create the base learners
+b.lrn1 = makeLearner("fdaclassif.classiKnn", 
+                     id = "Manhattan.lrn",
+                     par.vals = list(metric = "Manhattan"), 
+                     predict.type = "prob")
+b.lrn2 = makeLearner("fdaclassif.classiKnn", 
+                     id = "mean.lrn",
+                     par.vals = list(metric = "mean"), 
+                     predict.type = "prob")
+b.lrn3 = makeLearner("fdaclassif.classiKnn",
+                     id = "globMax.lrn",
+                     par.vals = list(metric = "globMax"), 
+                     predict.type = "prob")
 
-<!-- You can enable figure captions by `fig_caption: yes` in YAML: -->
+# create an ensemble learner as porposed in Fuchs etal. 2015
+# the default uses leave-one-out CV to estimate the weights of the base learners as proposed in the original paper
+# set resampling to CV for faster run time
+ensemble.lrn = makeStackedLearner(base.learners = list(b.lrn1, b.lrn2, b.lrn3), 
+                                  predict.type = "prob", 
+                                  resampling = makeResampleDesc("CV", iters = 5L),
+                                  method = "classif.bs.optimal")
 
-<!--     output: -->
-<!--       rmarkdown::html_vignette: -->
-<!--         fig_caption: yes -->
+# create another ensemble learner
+ensemble.rf.lrn = makeStackedLearner(base.learners = list(b.lrn1, b.lrn2, b.lrn3), 
+                                     super.learner = "classif.randomForest",
+                                     predict.type = "prob", 
+                                     method = "stack.cv")
 
-<!-- Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**. -->
+# train the model on the training data task
+ensemble.m = train(ensemble.lrn, task)
 
-<!-- ## More Examples -->
+# predict the test data set
+pred = predict(ensemble.m, newdata = ArrowHead[test_inds,])
 
-<!-- You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`. -->
-
-<!-- ```{r, echo=FALSE, results='asis'} -->
-<!-- knitr::kable(head(mtcars, 10)) -->
-<!-- ``` -->
-
-<!-- Also a quote using `>`: -->
-
-<!-- > "He who gives up [code] safety for [code] speed deserves neither." -->
-<!-- ([via](https://twitter.com/hadleywickham/status/504368538874703872)) -->
+```
