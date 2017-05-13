@@ -1,13 +1,12 @@
-
 #' @title Create a knn estimator for functional data classification.
 #'
-#' @description Creates an efficient knn estimator for functional data
+#' @description Creates an efficient k nearest neighbor estimator for functional data
 #' classification. Currently supported distance measures are all \code{metrics}
 #' implemented in \code{\link[proxy]{dist}}
 #' and all semimetrics suggested in
 #' Fuchs etal. 2015, Nearest neighbor ensembles for functional data with
 #' interpretable feature selection,
-#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100})
+#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
 #' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 #'
 #' @param classes [\code{factor(nrow(fdata))}]\cr
@@ -15,58 +14,20 @@
 #' @param fdata [\code{matrix}]\cr
 #'   matrix containing the functional observations as rows.
 #' @param grid [\code{numeric(ncol(fdata))}]\cr
-#'   numeric vector containing the grid on which the functional observations were
+#'   numeric vector of length \code{ncol(fdata)} containing the grid on which the functional observations were
 #'   evaluated.
 #' @param knn [\code{integer(1)}]\cr
-#' number of nearest neighbors to use in knn algorithm.
+#' number of nearest neighbors to use in the k nearest neighbor algorithm.
 #' @param metric [\code{character(1)}]\cr
-#' character string describing the distance function to be used.
-#'  \describe{
-#'   \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
-#'   \item{\code{Lp, Minkowski}}{the distance for an Lp-space.}
-#'   \item{\code{Manhattan}}{equals \code{Lp} with \code{p = 1}.}
-#'   \item{\code{supremum, max, maximum}}{equals \code{Lp} with \code{p = Inf}.
-#'   The supremal pointwise difference between the curves.}
-#'   \item{\code{...}}{all other available measures for \code{\link[proxy]{dist}}.}
-#'   \item{\code{shortEuclidean}}{Euclidean distance on a limited part of the domain.
-#'   Additional arguments \code{dmin} and \code{dmax} can be specified, giving
-#'   the index of the first and the last point to use of an evenly spaced
-#'   sequence from \code{grid[1]} to \code{grid[length(grid)]}.
-#'   The default values are \code{dmin = 1L} and \code{dmax = length(grid)},
-#'   which results in the Euclidean distance on the entire domain.}
-#'   \item{\code{mean}}{the absolute similarity of the overall mean values of
-#'   the observations.}
-#'   \item{\code{relAreas}}{the difference of the relation of two areas on parts
-#'   of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
-#'   \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
-#'   and take the same default values.}
-#'   \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2}.
-#'   The points \code{t1} and \code{t2} are the indices  in an evenly spaced sequence
-#'   from \code{grid[1]} to \code{grid[length(grid)]} of which to compare the
-#'   jump height. The default values are \code{t1 = 1} and \code{t2 = length(grid)}.}
-#'   \item{\code{globMax}}{the difference of the curves global maxima.}
-#'   \item{\code{globMin}}{the difference of the curves global minima}
-#'   \item{\code{points}}{the mean absolute differences at certain observation
-#'   points \code{poi}, also  called "points of impact". These are specified as
-#'   a vector of indices of an evenly spaced sequence from \code{grid[1]}
-#'   to \code{grid[length(grid)]}.
-#'   The default value is \code{1:length(grid)}, which results in the Manhattan
-#'   distance.}
-#'   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
-#'   own distance function in the argument \code{custom.metric}}
-#'   \item{\code{elastic, SRV}}{the elastic distance of the square root velocity
-#'   of the curves as described in
-#'   Srivastava etal 2011, 'Shape analysis of elastic curves in Euclidean spaces'
-#'   and implemented in \code{\link[fdasrvf]{elastic.distance}}.
-#'   Additional argument are the numeric the penalization parameters \code{a,b,c}
-#'   for the amount of bending (\code{a^2}) and stretching (\code{b^2}).
-#'   The default values are \code{a = 1/2, b = 1}
-#'   Alternatively \code{c} denotes the ratio of \code{2*a} and \code{b}.
-#'   \code{lambda} is the additional penalization parameter for the warping
-#'   allowed before calculating the elastic distance. The default is 0.
-#'  }}
+#'     character string specifying the (semi-)metric to be used.
+#'     For a an overview of what is available see the
+#'     \code{method} argument in \code{\link{computeDistMat}}. For a full list
+#'     execute \code{\link{metric.choices}()}.
 #' @param nderiv [\code{integer(1)}]\cr
-#'   The order of derivation on which the metric shall be computed.
+#'
+#'
+#'
+#'   order of derivation on which the metric shall be computed.
 #'   The default is 0L.
 #' @param derived [\code{logical(1)}]\cr
 #' Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
@@ -149,14 +110,15 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
                      metric = "Euclidean", nderiv = 0L, derived = FALSE,
                      deriv.method = "base.diff",
                      custom.metric = function(x, y, ...) {
-                       return(sqrt(sum((x - y)^2)))},
+                       return(sqrt(sum((x - y) ^ 2)))
+                     },
                      ...) {
   # check inputs
-  if(class(fdata) == "data.frame")
+  if (class(fdata) == "data.frame")
     fdata = as.matrix(fdata)
   assert_numeric(fdata)
   assertClass(fdata, "matrix")
- if(is.numeric(classes))
+  if (is.numeric(classes))
     classes = factor(classes)
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
@@ -173,7 +135,7 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   no.missing = !anyMissing(fdata)
 
   # TODO write better warning message
-  if(!no.missing) {
+  if (!no.missing) {
     warning("There are missing values in fdata. They will be filled using a spline representation!")
   }
 
@@ -209,8 +171,8 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
 #' @export
 predict.classiKnn = function(object, newdata = NULL, predict.type = "response", ...) {
   # input checking
-  if(!is.null(newdata)) {
-    if(class(newdata) == "data.frame")
+  if (!is.null(newdata)) {
+    if (class(newdata) == "data.frame")
       newdata = as.matrix(newdata)
     assertClass(newdata, "matrix")
     newdata = object$this.fdataTransform(newdata)

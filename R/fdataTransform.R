@@ -1,10 +1,12 @@
 #' @title Create a preprocessing pipeline function
 #'
-#' @description internal function, documented due to the importance of its
+#' @description Internal function, documented due to the importance of its
 #' concept. Creates a pipeline function to do all the
-#' preprocessing needed in \code{\link{classiKnn}}. This is helpful to ensure,
-#' that the data preprocessing is carried out in exactly the same way for the
-#' train and the test set in \code{predict.classiKnn}.
+#' preprocessing needed in \code{\link{classiKnn}} and \code{\link{classiKernel}}.
+#' This is helpful to ensure that the data preprocessing (imputation of missing
+#' values, derivation) is carried out in exactly the same way for the
+#' train and the test set in \code{predict.classiKnn} and
+#' \code{predict.classiKernel}.
 #'
 #' @param grid,nderiv,derived,evenly.spaced,no.missing,deriv.method see
 #' \code{\link{classiKnn}}
@@ -16,7 +18,7 @@
 #' @export
 fdataTransform = function(grid, nderiv, derived, evenly.spaced,
                           no.missing, deriv.method, ...) {
-  if((derived | nderiv == 0L) & evenly.spaced & no.missing) {
+  if ((derived | nderiv == 0L) & evenly.spaced & no.missing) {
     # original data can be used if no derivation or filling of missing values
     # or respacing is necessary
     return(function(fdata) fdata)
@@ -35,7 +37,6 @@ fdataTransform = function(grid, nderiv, derived, evenly.spaced,
       fda.fdata = fda::Data2fd(argvals = grid, t(fdata), ...)
       if (!(derived | nderiv == 0L)) {
         fda.fdata = fda::deriv.fd(fda.fdata, nderiv = nderiv)
-        # print("Derive")
       }
       fda.fdata = fda::eval.fd(evalarg = seq(grid[1], grid[length(grid)],
                                              length.out = length(grid)),

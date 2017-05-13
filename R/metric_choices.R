@@ -16,12 +16,13 @@
 #' @export
 metric.choices = function(proxy.only = FALSE) {
   proxy.list = proxy::pr_DB$get_entries()
-  is.metric = unlist(BBmisc::extractSubList(proxy.list, element = "type")) == "metric"
-  proxy.metric.names = unlist(BBmisc::extractSubList(proxy.list[is.metric], element = "names"))
+  is_metric = unlist(BBmisc::extractSubList(proxy.list, element = "type")) == "metric"
+  proxy_metric_names = unlist(BBmisc::extractSubList(proxy.list[is_metric],
+                                                     element = "names"))
   if (proxy.only) {
-    return(proxy.metric.names)
+    return(proxy_metric_names)
   } else {
-    return(c(proxy.metric.names,
+    return(c(proxy_metric_names,
              "shortEuclidean", "mean", "relAreas",
              "jump", "globMax", "globMin",
              "points", "custom.metric",

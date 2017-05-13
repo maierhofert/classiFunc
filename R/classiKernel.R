@@ -6,25 +6,27 @@
 #' and all semimetrics suggested in
 #' Fuchs et al. 2015, Nearest neighbor ensembles for functional data with
 #' interpretable feature selection,
-#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100})
+#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
 #' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 #' For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
 #' are admissible as well as custom kernel functions.
 #'
 #' @inheritParams classiKnn
 #' @param h [numeric(1)]\cr
-#'     the bandwidth of the kernel function. All kernel functions \code{K} must be
-#'     implemented to have bandwidth = 1. The bandwidth is controlled via \code{K(x/h)}.
+#'     the bandwidth of the kernel function. All kernel functions \code{ker} must be
+#'     implemented to have bandwidth = 1. The bandwidth is controlled via
+#'     \code{K(x) = ker(x/h)}.
 #' @param ker [numeric(1)]\cr
 #'     character describing the kernel function to use. Admissible are
 #'     amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
-#'     For the full list execute \code{\link{ker.choices}}.
+#'     For the full list execute \code{\link{ker.choices}()}.
 #'     The usage of customized kernel function is symbolized by
 #'     \code{ker = "custom.ker"}. The customized function can be specified in
 #'     \code{custom.ker}
 #' @param custom.ker [function(u)]\cr
 #'     customized kernel function. This has to a function with exactly one parameter
-#'     \code{u}. This function is only used if \code{ker == "custom.ker"}.
+#'     \code{u}, returning the numeric value of the kernel function
+#'     \code{ker(u)}. This function is only used if \code{ker == "custom.ker"}.
 #'
 #' @importFrom fda.usc Ker.norm Ker.cos Ker.epa Ker.tri Ker.quar Ker.unif
 #' AKer.norm AKer.cos AKer.epa AKer.tri AKer.quar AKer.unif
@@ -46,7 +48,7 @@
 #'   return((1 - abs(u)) * (abs(u) < 1))
 #' }
 #'
-#' # create the models
+#' # create the model
 #' mod1 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
 #'                     ker = "custom.ker", h = 2, custom.ker = myTriangularKernel)
 #'
@@ -61,18 +63,19 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
                         nderiv = 0L, derived = FALSE,
                         deriv.method = "base.diff",
                         custom.metric = function(x, y, ...) {
-                          return(sqrt(sum((x - y)^2)))},
+                          return(sqrt(sum((x - y) ^ 2)))
+                        },
                         custom.ker = function(u) {
                           return(dnorm(u))
                         },
                         ...) {
   # check inputs
-  if(class(fdata) == "data.frame")
+  if (class(fdata) == "data.frame")
     fdata = as.matrix(fdata)
   assert_numeric(fdata)
   assertClass(fdata, "matrix")
 
-  if(is.numeric(classes))
+  if (is.numeric(classes))
     classes = factor(classes)
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
@@ -85,11 +88,12 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 
 
   # check if data is evenly spaced  -> respace
-  evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)], length.out = length(grid)))
+  evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)],
+                                      length.out = length(grid)))
   no.missing = !checkmate::anyMissing(fdata)
 
   # TODO write better warning message
-  if(!no.missing) {
+  if (!no.missing) {
     warning("There are missing values in fdata. They will be filled using a spline representation!")
   }
 
@@ -129,8 +133,8 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 #' @export
 predict.classiKernel = function(object, newdata = NULL, predict.type = "response", ...) {
   # input checking
-  if(!is.null(newdata)) {
-    if(class(newdata) == "data.frame")
+  if (!is.null(newdata)) {
+    if (class(newdata) == "data.frame")
       newdata = as.matrix(newdata)
     assertClass(newdata, "matrix")
     newdata = object$this.fdataTransform(newdata)
@@ -145,32 +149,33 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
                                               custom.metric = object$custom.metric, ...),
                                          object$call$...))
   # apply kernel function
-  if(object$ker == "custom.ker") {
+  if (object$ker == "custom.ker") {
     this.ker = object$custom.ker
   } else {
     this.ker = object$ker
   }
 
   # Apply distance function after dividing by bandwidth
-  dist.kernel = apply(dist.mat / object$h, c(1,2), this.ker)
+  dist.kernel = apply(dist.mat / object$h, c(1, 2), this.ker)
 
   raw.result = aggregate(dist.kernel, by = list(classes = object$classes), sum, drop = FALSE)
 
   if (predict.type == "response") {
     # return class with highest probability
-    if(ncol(dist.mat) == 1L) { # exactly one observation in newdata
-      result = raw.result$classes[which.max(raw.result[,-1])]
+    if (ncol(dist.mat) == 1L) {
+      # exactly one observation in newdata
+      result = raw.result$classes[which.max(raw.result[, -1])]
     } else {
-      result = raw.result$classes[apply(raw.result[,-1], 2, which.max)]
+      result = raw.result$classes[apply(raw.result[, -1], 2, which.max)]
     }
-  } else  if (predict.type == "prob") {
+  } else if (predict.type == "prob") {
     # probabilities for the classes
-    if(ncol(dist.mat) == 1L) { # exactly one observation in newdata
-      result = raw.result[,-1] / sum(raw.result[,-1])
+    if (ncol(dist.mat) == 1L) { # exactly one observation in newdata
+      result = raw.result[, -1] / sum(raw.result[, -1])
       names(result) = raw.result$classes
     } else {
-      result = t(apply(raw.result[,-1], 2, function(x) {
-        if(sum(x) > 0) x / sum(x)
+      result = t(apply(raw.result[, -1], 2, function(x) {
+        if (sum(x) > 0) x / sum(x)
         else rep(1 / length(x), length(x)) # if all ker(dist(x,y)) == 0
       }))
       colnames(result) = raw.result$classes
@@ -178,5 +183,3 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
   }
   return(result)
 }
-
-

@@ -2,46 +2,97 @@
 #'
 #' @description This mainly internal function offers a unified framework to acces the
 #' \code{\link[proxy]{dist}} function from the \code{proxy} package and additional
-#' (semi-)metrics. For implemented methods see \code{\link{classiKnn}}.
+#' (semi-)metrics.
 #'
 #' @param x [\code{matrix}]\cr
-#'     matrix containing observations as rows
+#'   matrix containing observations as rows
 #' @param y [\code{matrix}]\cr
-#'     see \code{x}. The default \code{NULL} uses \code{y = x}.
+#'   see \code{x}. The default \code{NULL} uses \code{y = x}.
 #' @param method [\code{character(1)}]\cr
-#'     character string specifying the (semi-)metric to be used.
-#'     on the domain of \code{x}.
+#'   character string describing the distance function to be used. For a full list
+#'   execute \code{\link{metric.choices}()}.
+#'  \describe{
+#'   \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
+#'   \item{\code{Lp, Minkowski}}{the distance for an Lp-space, takes \code{p} as
+#'   an additional argument in \code{...}.}
+#'   \item{\code{Manhattan}}{equals \code{Lp} with \code{p = 1}.}
+#'   \item{\code{supremum, max, maximum}}{equals \code{Lp} with \code{p = Inf}.
+#'   The supremal pointwise difference between the curves.}
+#'   \item{\code{and ...}}{all other available measures for \code{\link[proxy]{dist}}.}
+#'   \item{\code{shortEuclidean}}{Euclidean distance on a limited part of the domain.
+#'   Additional arguments \code{dmin} and \code{dmax} can be specified in
+#'   \code{...}, giving
+#'   the position of the first and the last point to use of an evenly spaced
+#'   sequence from \code{0} to \code{1} of length \code{length(grid)}.
+#'   The default values are \code{dmin = o} and \code{dmax = 1},
+#'   which results in the Euclidean distance on the entire domain.}
+#'   \item{\code{mean}}{the absolute similarity of the overall mean values of
+#'   the observations.}
+#'   \item{\code{relAreas}}{the difference of the relation of two areas on parts
+#'   of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
+#'   \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
+#'   and take the same default values.}
+#'   \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2}.
+#'   The points \code{t1} and \code{t2} are the positions  in an evenly spaced sequence
+#'   from \code{0} to \code{1} of length \code{length(grid)} for which to compare the
+#'   jump height. The default values are \code{t1 = 0} and \code{t2 = 1}.}
+#'   \item{\code{globMax}}{the difference of the curves global maxima.}
+#'   \item{\code{globMin}}{the difference of the curves global minima.}
+#'   \item{\code{points}}{the mean absolute differences at certain observation
+#'   points \code{poi}, also  called "points of impact". These are specified as
+#'   a vector of indices of an evenly spaced sequence from \code{0}
+#'   to \code{1} of length \code{length(grid)}.
+#'   The default value is \code{seq(0, 1, length.out = length(grid))}, which results in the Manhattan
+#'   distance.}
+#'   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
+#'   own distance function in the argument \code{custom.metric}.}
+#'   \item{\code{amplitudeDistance,phaseDistance}}{The amplitude distance or
+#'   phase distance as described in
+#'   Srivastava and Klassen 2016, 'Functional and shape data analysis'
+#'   (http://link.springer.com/book/10.1007/978-1-4939-4020-2)
+#'   }
+#'   \item{\code{FisherRao, elasticMetric}}{the elastic distance of the square
+#'   root velocity of the curves as described in
+#'   Srivastava etal 2011, 'Shape analysis of elastic curves in Euclidean spaces'
+#'   (\url{http://ieeexplore.ieee.org/abstract/document/5601739/}). This equates
+#'   to the Fisher Rao metric.}
+#'   \item{\code{elasticDistance}}{weighted mean of the amplitude and the phase
+#'   distance using the implementation in \code{\link[fdasrvf]{elastic.distance}}.
+#'   Additional arguments are the numeric the penalization parameters \code{a,b,c}
+#'   for the amplitude distance (\code{a^2}) and the phase distance (\code{b^2}).
+#'   The default values are \code{a = 1/2, b = 1}.
+#'   Alternatively \code{c} denotes the ratio of \code{2*a} and \code{b}.
+#'   \code{lambda} is the additional penalization parameter for the warping
+#'   allowed before calculating the elastic distance. The default is 1.
+#'  }}
 #' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 [\code{integer(1)}]\cr
-#'     encode the indizes used to define subspaces for
-#'     \code{method \%in\% c("shortEuclidean", "relAreas")}
-#'     as numeric values between 0 and 1 by
-#'     \code{index = round(quantile(1:ncol(x), probs = dmin))}.
+#'   encode the indizes used to define subspaces for
+#'   \code{method \%in\% c("shortEuclidean", "relAreas")}
+#'   as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
+#'   1 encodes \code{grid[length(grid)]}.
 #' @param t1,t2 [\code{numeric(1)}]\cr
-#'     encode the index of the points for which to compare the jump heights in
-#'     \code{method = "jump"} as numeric values between 0 and 1 by
-#'     \code{index = round(quantile(1:ncol(x), probs = t1))}.
+#'   encode the position of the points for which to compare the jump heights in
+#'   \code{method = "jump"} as numeric values between 0 and 1, see \code{dmin}.
 #' @param .poi [\code{numeric(1 to ncol(x))}]\cr
-#'     numeric vector of length between 1 and \code{ncol(x)} taking numeric values
-#'     between 0 and 1, denoting the
-#'     index of the points of interest by
-#'     \code{index = round(quantile(1:ncol(x), probs = .poi))}
-#'     for \code{method = "points"}.
+#'   numeric vector of length between 1 and \code{ncol(x)} taking numeric values
+#'   between 0 and 1, denoting the
+#'   position of the points of interest for \code{method = "points"}.
 #' @param custom.metric [\code{function(x, y, ...)}]\cr
-#'     a function specifying how to compute the distance between
-#'     two functional observations (= numeric vectors of the same length)
-#'     \code{x} and \code{y}. It can handle additional arguments in \code{...}.
-#'     The default is the Euclidean distance (equals Minkwoski distance
-#'     with \code{lp = 2}). Used if \code{method = "custom.metric"}.
+#'   a function specifying how to compute the distance between
+#'   two functional observations (= numeric vectors of the same length)
+#'   \code{x} and \code{y}. It can handle additional arguments in \code{...}.
+#'   The default is the Euclidean distance (equals Minkwoski distance
+#'   with \code{lp = 2}). Used for \code{method = "custom.metric"}.
 #' @param a,b,c [\code{numeric(1)}]\cr
-#'     weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
-#'     in a semimetric that combines them by addition.
-#'     Used for \code{method == 'elasticDistance'}.
+#'   weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
+#'   in a semimetric that combines them by addition.
+#'   Used for \code{method == 'elasticDistance'}.
 #' @param lambda [\code{numeric(1)}]\cr
-#'     penalization parameter for the warping allowed before calculating the
-#'     elastic distance.
-#'     Default value is 0. Large values imply less (no) warping, small values
-#'     imply more warping.
-#'     Used for \code{method \%in\% c('elastic', 'SRV')}.
+#'   penalization parameter for the warping allowed before calculating the
+#'   elastic distance.
+#'   Default value is 0. Large values imply less (no) warping, small values
+#'   imply more warping.
+#'   Used for \code{method \%in\% c('elastic', 'SRV')}.
 #'
 #' @param ... additional parameters to the (semi-)metrics.
 #' @importFrom stats quantile
@@ -54,26 +105,27 @@ computeDistMat = function(x, y = NULL,
                           t1 = 0, t2 = 1,
                           .poi = seq(0, 1, length.out = ncol(x)),
                           custom.metric = function(x, y, lp = 2, ...) {
-                            return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
+                            return(sum(abs(x - y) ^ lp) ^ (1 / lp))
+                          },
                           a = NULL, b = NULL, c = NULL, lambda = 0,
                           ...) {
 
   assertChoice(method, choices = metric.choices())
 
-  if(method %in% metric.choices(proxy.only = TRUE)) {
+  if (method %in% metric.choices(proxy.only = TRUE)) {
     return(as.matrix(proxy::dist(x, y, method = method, ...)))
   }
 
 
-  if(method == "custom.metric") {
+  if (method == "custom.metric") {
     return(as.matrix(proxy::dist(x, y, method = custom.metric, ...)))
   }
 
   # new semimetrics from fuchs etal 2015
   # they need two matrices as x and y
-  if(is.null(y)) y = x
+  if (is.null(y)) y = x
 
-  if(method == "shortEuclidean") {
+  if (method == "shortEuclidean") {
     assertNumeric(dmin, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     assertNumeric(dmax, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     stopifnot(dmin <= dmax)
@@ -81,15 +133,15 @@ computeDistMat = function(x, y = NULL,
     # convert to index
     dmin = round(quantile(1:ncol(x), probs = dmin))
     dmax = round(quantile(1:ncol(x), probs = dmax))
-    return(computeDistMat(x[,dmin:dmax],
-                          y[,dmin:dmax], "Euclidean"))
+    return(computeDistMat(x[, dmin:dmax],
+                          y[, dmin:dmax], "Euclidean"))
   }
 
-  if(method == "mean") {
+  if (method == "mean") {
     return(abs(outer(rowMeans(x), rowMeans(y), "-")))
   }
 
-  if(method == "relAreas") {
+  if (method == "relAreas") {
     assertNumeric(dmin1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     assertNumeric(dmax1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     assertNumeric(dmin2, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
@@ -103,12 +155,12 @@ computeDistMat = function(x, y = NULL,
     dmin2 = round(quantile(1:ncol(x), probs = dmin2))
     dmax2 = round(quantile(1:ncol(x), probs = dmax2))
 
-    relArea.x = abs(rowMeans(x[,dmin1:dmax1]) /  rowMeans(x[,dmin2:dmax2]))
-    relArea.y = abs(rowMeans(y[,dmin1:dmax1]) /  rowMeans(y[,dmin2:dmax2]))
+    relArea.x = abs(rowMeans(x[, dmin1:dmax1]) /  rowMeans(x[, dmin2:dmax2]))
+    relArea.y = abs(rowMeans(y[, dmin1:dmax1]) /  rowMeans(y[, dmin2:dmax2]))
     return(abs(outer(relArea.x, relArea.y, "-")))
   }
 
-  if(method == "jump") {
+  if (method == "jump") {
     assertNumeric(t1, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
     assertNumeric(t2, lower = 0, upper = 1, len = 1L, any.missing = FALSE)
 
@@ -116,37 +168,36 @@ computeDistMat = function(x, y = NULL,
     t1 = round(quantile(1:ncol(x), probs = t1))
     t2 = round(quantile(1:ncol(x), probs = t2))
 
-    jump.x = x[,t2] - x[,t1]
-    jump.y = y[,t2] - y[,t1]
+    jump.x = x[, t2] - x[, t1]
+    jump.y = y[, t2] - y[, t1]
 
     return(abs(outer(jump.x, jump.y, "-")))
 
   }
 
-  if(method == "globMax") {
+  if (method == "globMax") {
     max.x = apply(x, 1,  max)
     max.y = apply(y, 1,  max)
     return(abs(outer(max.x, max.y, "-")))
   }
 
-  if(method == "globMin") {
+  if (method == "globMin") {
     min.x = apply(x, 1,  min)
     min.y = apply(y, 1,  min)
     return(abs(outer(min.x, min.y, "-")))
   }
 
-  if(method == "points") {
+  if (method == "points") {
     assertNumeric(.poi, lower = 0, upper = 1, any.missing = FALSE,
-                     min.len = 1L, max.len = ncol(x), unique = TRUE)
+                  min.len = 1L, max.len = ncol(x), unique = TRUE)
     # convert to index
     .poi = round(quantile(1:ncol(x), probs = .poi))
-
     return(computeDistMat(x[,.poi], y[,.poi], method = "Manhattan"))
   }
 
   # New semimetric from TM
   # TODO check if this is correct
-  if(method == "dtwPath") {
+  if (method == "dtwPath") {
     # define the difference of dtw paths
     dtwPath = function(x, y, ...) {
       dist = dtw::dtw(x, y, ...)
@@ -157,18 +208,18 @@ computeDistMat = function(x, y = NULL,
 
   # Metrics from the SRV framework
   # amplitude distance
-  if(method %in% c("amplitudeDistance")) {
+  if (method %in% c("amplitudeDistance")) {
     return(computeDistMat(x, y, method = "elasticDistance",
                           a = 1, b = 0, lambda = lambda))
   }
   # phase distance
-  if(method %in% c("phaseDistance")) {
+  if (method %in% c("phaseDistance")) {
     return(computeDistMat(x, y, method = "elasticDistance",
                           a = 0, b = 1, lambda = lambda))
   }
   # TODO check if this is mathematically correct
   # Fisher-Rao metric
-  if(method %in% c("FisherRao", "elasticMetric")) {
+  if (method %in% c("FisherRao", "elasticMetric")) {
     q1 = fdasrvf::f_to_srvf(t(x), time = 1:nrow(x))
     q2 = fdasrvf::f_to_srvf(t(y), time = 1:nrow(x))
     return(computeDistMat(t(q1), t(q2), method = "Euclidean"))
@@ -180,13 +231,13 @@ computeDistMat = function(x, y = NULL,
 
   # this method returns the phase and the amplitude distance
   # I do not know how it relates to the elastic metric
-  if(method %in% c("elasticDistance")) {
+  if (method %in% c("elasticDistance")) {
     # input checking
     assertNumeric(a, lower = 0, len = 1L, null.ok = TRUE)
     assertNumeric(b, lower = 0, len = 1L, null.ok = TRUE)
     assertNumeric(c, lower = 0, len = 1L, null.ok = TRUE)
     assertNumeric(lambda, len = 1L)
-    if(lambda < 0)
+    if (lambda < 0)
       warning(paste("Please do not specify lambda as < 0",
                     "It think it does not make sense.",
                     "The execution continues with your specified value."))
@@ -195,7 +246,7 @@ computeDistMat = function(x, y = NULL,
     # TODO: As I do not know how this relates to the elastic metric,
     # I do not know if the default values make sense
     # probably not
-    if(is.null(a) & is.null(b) & is.null(c)) {
+    if (is.null(a) & is.null(b) & is.null(c)) {
       c = 1
       a = 0.5
       b = 1
@@ -214,15 +265,14 @@ computeDistMat = function(x, y = NULL,
     assert(all.equal(c, b / (2 * a)))
 
     # elastic distance function
-    el.dist = function(x, y, a, b, lambda) {
-      el.d = fdasrvf::elastic.distance(x, y,
+    el_dist = function(x, y, a, b, lambda) {
+      el_d = fdasrvf::elastic.distance(x, y,
                                        time = 1:length(x),
                                        lambda = lambda)
-      weighted.el.d = a^2 * el.d$Dy + b^2 * el.d$Dx
-      return(weighted.el.d)
+      weighted_el_d = a ^ 2 * el_d$Dy + b ^ 2 * el_d$Dx
+      return(weighted_el_d)
     }
-    return(as.matrix(proxy::dist(x, y, method = el.dist, a = a, b = b, lambda = lambda)))
+    return(as.matrix(proxy::dist(x, y, method = el_dist, a = a, b = b, lambda = lambda)))
   }
 
 }
-

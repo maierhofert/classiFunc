@@ -3,7 +3,7 @@
 #'
 #' \code{ker.choices} is a function returning the names of  all
 #' kernel functions that are currently implemented in the
-#' \code{link{classiFunc}}-package and can be used for the argument
+#' \code{\link{classiFunc}}-package and can be used for the argument
 #' \code{ker} in \code{\link{classiKernel}}.
 #'
 #' @export
