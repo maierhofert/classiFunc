@@ -18,71 +18,34 @@ factor of length \code{nrow(fdata)} containing the classes of the observations.}
 matrix containing the functional observations as rows.}
 
 \item{grid}{[\code{numeric(ncol(fdata))}]\cr
-numeric vector containing the grid on which the functional observations were
+numeric vector of length \code{ncol(fdata)} containing the grid on which the functional observations were
 evaluated.}
 
 \item{h}{[numeric(1)]\cr
-the bandwidth of the kernel function. All kernel functions \code{K} must be
-implemented to have bandwidth = 1. The bandwidth is controlled via \code{K(x/h)}.}
+the bandwidth of the kernel function. All kernel functions \code{ker} must be
+implemented to have bandwidth = 1. The bandwidth is controlled via
+\code{K(x) = ker(x/h)}.}
 
 \item{metric}{[\code{character(1)}]\cr
-character string describing the distance function to be used.
- \describe{
-  \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
-  \item{\code{Lp, Minkowski}}{the distance for an Lp-space.}
-  \item{\code{Manhattan}}{equals \code{Lp} with \code{p = 1}.}
-  \item{\code{supremum, max, maximum}}{equals \code{Lp} with \code{p = Inf}.
-  The supremal pointwise difference between the curves.}
-  \item{\code{...}}{all other available measures for \code{\link[proxy]{dist}}.}
-  \item{\code{shortEuclidean}}{Euclidean distance on a limited part of the domain.
-  Additional arguments \code{dmin} and \code{dmax} can be specified, giving
-  the index of the first and the last point to use of an evenly spaced
-  sequence from \code{grid[1]} to \code{grid[length(grid)]}.
-  The default values are \code{dmin = 1L} and \code{dmax = length(grid)},
-  which results in the Euclidean distance on the entire domain.}
-  \item{\code{mean}}{the absolute similarity of the overall mean values of
-  the observations.}
-  \item{\code{relAreas}}{the difference of the relation of two areas on parts
-  of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
-  \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
-  and take the same default values.}
-  \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2}.
-  The points \code{t1} and \code{t2} are the indices  in an evenly spaced sequence
-  from \code{grid[1]} to \code{grid[length(grid)]} of which to compare the
-  jump height. The default values are \code{t1 = 1} and \code{t2 = length(grid)}.}
-  \item{\code{globMax}}{the difference of the curves global maxima.}
-  \item{\code{globMin}}{the difference of the curves global minima}
-  \item{\code{points}}{the mean absolute differences at certain observation
-  points \code{poi}, also  called "points of impact". These are specified as
-  a vector of indices of an evenly spaced sequence from \code{grid[1]}
-  to \code{grid[length(grid)]}.
-  The default value is \code{1:length(grid)}, which results in the Manhattan
-  distance.}
-  \item{\code{custom.metric}}{your own semimetric will be used. Specify your
-  own distance function in the argument \code{custom.metric}}
-  \item{\code{elastic, SRV}}{the elastic distance of the square root velocity
-  of the curves as described in
-  Srivastava etal 2011, 'Shape analysis of elastic curves in Euclidean spaces'
-  and implemented in \code{\link[fdasrvf]{elastic.distance}}.
-  Additional argument are the numeric the penalization parameters \code{a,b,c}
-  for the amount of bending (\code{a^2}) and stretching (\code{b^2}).
-  The default values are \code{a = 1/2, b = 1}
-  Alternatively \code{c} denotes the ratio of \code{2*a} and \code{b}.
-  \code{lambda} is the additional penalization parameter for the warping
-  allowed before calculating the elastic distance. The default is 0.
- }}}
+character string specifying the (semi-)metric to be used.
+For a an overview of what is available see the
+\code{method} argument in \code{\link{computeDistMat}}. For a full list
+execute \code{\link{metric.choices}()}.}
 
 \item{ker}{[numeric(1)]\cr
 character describing the kernel function to use. Admissible are
 amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
-For the full list execute \code{\link{ker.choices}}.
+For the full list execute \code{\link{ker.choices}()}.
 The usage of customized kernel function is symbolized by
 \code{ker = "custom.ker"}. The customized function can be specified in
 \code{custom.ker}}
 
 \item{nderiv}{[\code{integer(1)}]\cr
-The order of derivation on which the metric shall be computed.
-The default is 0L.}
+
+
+
+  order of derivation on which the metric shall be computed.
+  The default is 0L.}
 
 \item{derived}{[\code{logical(1)}]\cr
 Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
@@ -108,7 +71,8 @@ See how to implement your distance function in \code{\link[proxy]{dist}}}
 
 \item{custom.ker}{[function(u)]\cr
 customized kernel function. This has to a function with exactly one parameter
-\code{u}. This function is only used if \code{ker == "custom.ker"}.}
+\code{u}, returning the numeric value of the kernel function
+\code{ker(u)}. This function is only used if \code{ker == "custom.ker"}.}
 
 \item{...}{further arguments to and from other methods. Hand over additional arguments to
 \code{\link{computeDistMat}}, usually additional arguments for the specified
@@ -124,7 +88,7 @@ supported distance measures are all \code{metrics} implemented in \code{\link[pr
 and all semimetrics suggested in
 Fuchs et al. 2015, Nearest neighbor ensembles for functional data with
 interpretable feature selection,
-(\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100})
+(\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
 Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
 are admissible as well as custom kernel functions.
@@ -145,7 +109,7 @@ myTriangularKernel = function(u) {
   return((1 - abs(u)) * (abs(u) < 1))
 }
 
-# create the models
+# create the model
 mod1 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
                     ker = "custom.ker", h = 2, custom.ker = myTriangularKernel)
 

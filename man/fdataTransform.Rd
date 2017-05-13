@@ -19,9 +19,11 @@ function carries out all the preprocessing needed for the calling model
 of class \code{\link{classiKnn}}.
 }
 \description{
-internal function, documented due to the importance of its
+Internal function, documented due to the importance of its
 concept. Creates a pipeline function to do all the
-preprocessing needed in \code{\link{classiKnn}}. This is helpful to ensure,
-that the data preprocessing is carried out in exactly the same way for the
-train and the test set in \code{predict.classiKnn}.
+preprocessing needed in \code{\link{classiKnn}} and \code{\link{classiKernel}}.
+This is helpful to ensure that the data preprocessing (imputation of missing
+values, derivation) is carried out in exactly the same way for the
+train and the test set in \code{predict.classiKnn} and
+\code{predict.classiKernel}.
 }
