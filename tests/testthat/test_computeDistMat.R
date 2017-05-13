@@ -5,24 +5,19 @@ test_that("computeDistMat works for all specified metrics", {
   set.seed(123)
   dat = matrix(rnorm(n = 20), 5, byrow = TRUE)
   mets = metric.choices()
-  mets.no.add.params = mets[!mets %in% c("Minkowski", "Lp",
+  mets_no_add_params = mets[!mets %in% c("Minkowski", "Lp",
                                          "Mahalanobis",
                                          "fJaccard", "fuzzy_Jaccard",
                                          "Bhjattacharyya",
                                          "Kullback", "Leibler",
                                          "Hellinger")]
-  distMats = lapply(mets.no.add.params, computeDistMat, x = dat, y = dat)
+  distMats = lapply(mets_no_add_params, computeDistMat, x = dat, y = dat)
   expect_true(all(sapply(distMats, is.matrix)))
 
 
   # Minkowski needs additional parameter p
   distMat.Minkowski = computeDistMat(x = dat, method = "Minkowski", p = 2)
   assertMatrix(distMat.Minkowski)
-  # # Mahalanobis does not work for this simple data
-  # distMat.Mahalanobis = computeDistMat(x = dat, method = "Mahalanobis")
-  # distMat.Mahalanobis
-
-
 
   # Bhjattacharyya, Kullback Leibler and Hellinger are for distributions
   # create arbitrary distributions
@@ -48,7 +43,9 @@ test_that("computeDistMat works for custom metrics", {
   distEuclidean = computeDistMat(x = dat, method = "Euclidean")
 
   # custom metric
-  myManhattan = function(x,y) {return(sum(abs(x - y)))}
+  myManhattan = function(x,y) {
+    return(sum(abs(x - y)))
+  }
   distMat2 = computeDistMat(x = dat, method = "custom.metric",
                             custom.metric = myManhattan)
   distManhattan = computeDistMat(x = dat, method = "Manhattan")
@@ -62,7 +59,6 @@ test_that("computeDistMat works for custom metrics", {
                             custom.metric = myMinkowski, lp = 3)
   distMinkowski = computeDistMat(x = dat, method = "Minkowski", p = 3)
   expect_equal(distMat3, distMinkowski)
-
 })
 
 

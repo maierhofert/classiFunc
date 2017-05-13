@@ -3,13 +3,13 @@ context("classiKnn")
 
 test_that("classiKnn works for arrow head data set", {
   data("ArrowHead")
-  classes = ArrowHead[,"target"]
+  classes = ArrowHead[, "target"]
 
   set.seed(123)
   train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
   test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
 
-  ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
+  ArrowHead = ArrowHead[, !colnames(ArrowHead) == "target"]
 
   mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,])
   mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
@@ -50,13 +50,13 @@ test_that("classiKnn works for phoneme data set from fda.usc package", {
 
 test_that("classiKnn works for custom semimetrics", {
   data("ArrowHead")
-  classes = ArrowHead[,"target"]
+  classes = ArrowHead[, "target"]
 
   set.seed(123)
   train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
   test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
 
-  ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
+  ArrowHead = ArrowHead[, !colnames(ArrowHead) == "target"]
 
 
   # custom metric with additional parameters
@@ -159,25 +159,18 @@ test_that("classiKnn works with elastic distance from the square root velocity f
   data("ArrowHead")
   ArrowHead = subset(ArrowHead, subset = c(TRUE, FALSE),
                      select = c(FALSE, FALSE, TRUE))
-  classes = ArrowHead[,"target"]
+  classes = ArrowHead[, "target"]
 
   set.seed(123)
   train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
   test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
 
-  ArrowHead = ArrowHead[,!colnames(ArrowHead) == "target"]
+  ArrowHead = ArrowHead[, !colnames(ArrowHead) == "target"]
 
   mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
                    metric = "elasticDistance", lambda = Inf)
-  # mod2 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-  #                  metric = "elastic", a = 1, b = 2, lambda = Inf)
-
   pred1 = predict(mod1, newdata = ArrowHead[test_inds,],
-                                 predict.type = "response")
-  # pred2 = predict(mod2, newdata = ArrowHead[test_inds,], predict.type = "response")
+                  predict.type = "response")
   expect_factor(pred1, len = length(test_inds), any.missing = FALSE,
                 levels = levels(classes[train_inds]))
-  # expect_factor(pred2, len = length(test_inds), any.missing = FALSE,
-  #               levels = levels(classes[train_inds]))
-  # expect_equal(pred1, pred2)
 })
