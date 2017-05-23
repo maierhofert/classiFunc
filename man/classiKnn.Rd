@@ -30,11 +30,8 @@ For a an overview of what is available see the
 execute \code{\link{metric.choices}()}.}
 
 \item{nderiv}{[\code{integer(1)}]\cr
-
-
-
-  order of derivation on which the metric shall be computed.
-  The default is 0L.}
+order of derivation on which the metric shall be computed.
+The default is 0L.}
 
 \item{derived}{[\code{logical(1)}]\cr
 Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},

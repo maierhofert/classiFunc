@@ -24,9 +24,6 @@
 #'     \code{method} argument in \code{\link{computeDistMat}}. For a full list
 #'     execute \code{\link{metric.choices}()}.
 #' @param nderiv [\code{integer(1)}]\cr
-#'
-#'
-#'
 #'   order of derivation on which the metric shall be computed.
 #'   The default is 0L.
 #' @param derived [\code{logical(1)}]\cr
