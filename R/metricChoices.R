@@ -1,7 +1,7 @@
 # global function naming all implemented (semi-)metrics
-#' Name all metrics
+#' List the names of all metrics
 #'
-#' \code{metric.choices} is a function returning the names of  all
+#' \code{metricChoices} is a function returning the names of  all
 #' (semi-)metrics that are currently implemented in the
 #' \code{link{classiFunc}}-package and can be used for the argument
 #' \code{method} in \code{\link{computeDistMat}} or the argument
@@ -14,7 +14,7 @@
 #'     for \code{\link{computeDistMat}}.
 #'
 #' @export
-metric.choices = function(proxy.only = FALSE) {
+metricChoices = function(proxy.only = FALSE) {
   proxy.list = proxy::pr_DB$get_entries()
   is_metric = unlist(BBmisc::extractSubList(proxy.list, element = "type")) == "metric"
   proxy_metric_names = unlist(BBmisc::extractSubList(proxy.list[is_metric],

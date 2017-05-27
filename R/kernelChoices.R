@@ -1,13 +1,14 @@
 # global function naming all implemented kernel functions
-#' Name all implemented kernel functions
+
+#' List the names of all implemented kernel functions
 #'
-#' \code{ker.choices} is a function returning the names of  all
+#' \code{kerChoices} is a function returning the names of  all
 #' kernel functions that are currently implemented in the
 #' \code{\link{classiFunc}}-package and can be used for the argument
 #' \code{ker} in \code{\link{classiKernel}}.
 #'
 #' @export
-ker.choices = function() {
+kerChoices = function() {
   ker.names = c(
     # from fda.usc
     "Ker.norm", "Ker.cos", "Ker.epa", "Ker.tri", "Ker.quar",
