@@ -3,10 +3,7 @@
 #' @description Creates an efficient k nearest neighbor estimator for functional data
 #' classification. Currently supported distance measures are all \code{metrics}
 #' implemented in \code{\link[proxy]{dist}}
-#' and all semimetrics suggested in
-#' Fuchs etal. 2015, Nearest neighbor ensembles for functional data with
-#' interpretable feature selection,
-#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
+#' and all semimetrics suggested in Fuchs et al. (2015).
 #' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 #'
 #' @param classes [\code{factor(nrow(fdata))}]\cr
@@ -22,12 +19,12 @@
 #'     character string specifying the (semi-)metric to be used.
 #'     For a an overview of what is available see the
 #'     \code{method} argument in \code{\link{computeDistMat}}. For a full list
-#'     execute \code{\link{metric.choices}()}.
+#'     execute \code{\link{metricChoices}()}.
 #' @param nderiv [\code{integer(1)}]\cr
 #'   order of derivation on which the metric shall be computed.
 #'   The default is 0L.
 #' @param derived [\code{logical(1)}]\cr
-#' Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
+#' Is the data given in \code{fdata} already derived? Default is set to \code{FALSE},
 #' which will lead to numerical derivation if \code{nderiv >= 1L} by applying
 #' \code{\link[fda]{deriv.fd}} on a \code{\link[fda]{Data2fd}} representation of
 #' \code{fdata}.
@@ -44,7 +41,7 @@
 #' A function of functional observations
 #' \code{x} and \code{y} returning their distance.
 #' The default is the Euclidean distance.
-#' See how to implement your distance function in \code{\link[proxy]{dist}}
+#' See how to implement your distance function in \code{\link[proxy]{dist}}.
 #' @param ...
 #' further arguments to and from other methods. Hand over additional arguments to
 #' \code{\link{computeDistMat}}, usually additional arguments for the specified
@@ -81,6 +78,10 @@
 #'   training data set and future (test) data sets.}
 #'  }
 #'
+#' @references
+#' Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+#' Nearest neighbor ensembles for functional data with interpretable feature selection.
+#' Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
 #'
 #' @examples
 #' # Classification of the Phoneme data
@@ -95,13 +96,15 @@
 #' # create functional data as matrix with observations as rows
 #' fdata = Phoneme[,!colnames(Phoneme) == "target"]
 #'
-#' # create 3 nearest neighbor classifier with Euclidean distance (default) of the
+#' # create k = 3 nearest neighbors classifier with Euclidean distance (default) of the
 #' # first order derivative of the data
 #' mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
 #'                  nderiv = 1L, knn = 3L)
 #'
 #' # predict the model for the test set
 #' pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
+#'
+#' @seealso \link{predict.classiKnn}
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
                      metric = "Euclidean", nderiv = 0L, derived = FALSE,
@@ -120,7 +123,7 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   assertFactor(classes, any.missing = FALSE, len = nrow(fdata))
   assertNumeric(grid, any.missing = FALSE, len = ncol(fdata))
   assertIntegerish(knn, lower = 1L, upper = nrow(fdata), len = 1)
-  assertChoice(metric, choices = metric.choices())
+  assertChoice(metric, choices = metricChoices())
   assertIntegerish(nderiv, lower = 0L)
   assertFlag(derived)
   assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
@@ -164,7 +167,26 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   return(ret)
 }
 
-
+#' predict a classiKnn object
+#'
+#' predict function for a classiKnn object.
+#'
+#' @param object [\code{classiKnn}]\cr
+#'   object of class classiKnn to get predictions from
+#' @param newdata [\code{data.frame}]\cr
+#'   (optional) new data to predict from with observations as rows. Do not derive this data,
+#'   this will be done automatically if required by the model. If \code{NULL},
+#'   the training data is predicted, currently without using a leave-one-out prediction.
+#' @param predict.type [\code{character(1)}]\cr
+#'   one of 'response' or 'prob', indicating the type of prediction. Choose
+#'   'response' to return a vector of length \code{nrow(newdata)} containing the
+#'   most predicted class.
+#'   Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
+#'   the probabilities for the classes as columns.
+#' @param ... [\code{list}]\cr
+#'   additional arguments to \link{computeDistMat}.
+#'
+#' @seealso classiKnn
 #' @export
 predict.classiKnn = function(object, newdata = NULL, predict.type = "response", ...) {
   # input checking
@@ -201,4 +223,25 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
     }))
   }
   return(result)
+}
+
+#' @export
+print.classiKnn = function(x, ...) {
+  cat("\n")
+  cat("\t classiKnn object \n")
+  cat("\n")
+  cat("data: \n")
+  cat("", length(levels(x$classes)), "classes:", levels(x$classes), "\n")
+  cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
+  cat("algorithm: \n")
+  cat(" metric =", x$metric, "\n")
+  cat(" k = ", x$knn, "\n")
+  cat(" nderiv =", x$nderiv, "\n")
+  cat("\n")
+}
+
+
+#' @export
+summary.classiKnn = function(object, ...) {
+  print(object, ...)
 }
