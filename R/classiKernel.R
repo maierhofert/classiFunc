@@ -3,34 +3,67 @@
 #' @description Creates an efficient kernel estimator for functional data
 #' classification. Currently
 #' supported distance measures are all \code{metrics} implemented in \code{\link[proxy]{dist}}
-#' and all semimetrics suggested in
-#' Fuchs et al. 2015, Nearest neighbor ensembles for functional data with
-#' interpretable feature selection,
-#' (\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
-#' Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
+#' and all semimetrics suggested in Fuchs et al. (2015).
+#' Additionally, all (semi-)metrics can be used on a derivative of arbitrary
+#' order of the functional observations.
 #' For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
-#' are admissible as well as custom kernel functions.
+#' are available as well as custom kernel functions.
 #'
 #' @inheritParams classiKnn
 #' @param h [numeric(1)]\cr
-#'     the bandwidth of the kernel function. All kernel functions \code{ker} must be
-#'     implemented to have bandwidth = 1. The bandwidth is controlled via
-#'     \code{K(x) = ker(x/h)}.
+#'     controls the bandwidth of the kernel function. All kernel functions \code{ker} should be
+#'     implemented to have bandwidth = 1. The bandwidth is controlled via \code{h}
+#'     by using \code{K(x) = ker(x/h)} as the kernel function.
 #' @param ker [numeric(1)]\cr
-#'     character describing the kernel function to use. Admissible are
+#'     character describing the kernel function to use. Available are
 #'     amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
-#'     For the full list execute \code{\link{ker.choices}()}.
+#'     For the full list execute \code{\link{kerChoices}()}.
 #'     The usage of customized kernel function is symbolized by
 #'     \code{ker = "custom.ker"}. The customized function can be specified in
 #'     \code{custom.ker}
 #' @param custom.ker [function(u)]\cr
-#'     customized kernel function. This has to a function with exactly one parameter
+#'     customized kernel function. This has to be a function with exactly one parameter
 #'     \code{u}, returning the numeric value of the kernel function
 #'     \code{ker(u)}. This function is only used if \code{ker == "custom.ker"}.
+#'     The bandwidth should be constantly equal to 1 and is controlled via \code{h}.
 #'
 #' @importFrom fda.usc Ker.norm Ker.cos Ker.epa Ker.tri Ker.quar Ker.unif
 #' AKer.norm AKer.cos AKer.epa AKer.tri AKer.quar AKer.unif
 #' @importFrom stats aggregate dnorm
+#'
+#'
+#' @return \code{classiKernel} returns an object of class \code{'classiKernel'}.
+#' This is a list containing  at least the
+#' following components:
+#'  \describe{
+#'   \item{\code{classes}}{a factor of length nrow(fdata) coding the response of
+#'   the training data set.}
+#'   \item{\code{fdata}}{the raw functional data as a matrix with the individual
+#'   observations as rows.}
+#'   \item{\code{proc.fdata}}{the preprocessed data (missing values interpolated,
+#'   derived and evenly spaced). This data is \code{this.fdataTransform(fdata)}.
+#'   See \code{this.fdataTransform} for more details.}
+#'   \item{\code{grid}}{numeric vector containing the grid on which \code{fdata}
+#'   is observed)}
+#'   \item{\code{h}}{numeric value giving the bandwidth to be used in the kernel function.}
+#'   \item{\code{ker}}{character encoding the kernel function to use.}
+#'   \item{\code{metric}}{character string coding the distance metric to be used
+#'   in \code{\link{computeDistMat}}.}
+#'   \item{\code{nderiv}}{integer giving the order of derivation that is applied
+#'   to fdata before computing the distances between the observations.}
+#'   \item{\code{this.fdataTransform}}{preprocessing function taking new data as
+#'   a matrix. It is used to transform \code{fdata} into \code{proc.fdata} and
+#'   is required to preprocess new data in order to predict it. This function
+#'   ensures, that preprocessing (derivation, respacing and interpolation of
+#'   missing values) is done in the exact same way for the original
+#'   training data set and future (test) data sets.}
+#'   \item{\code{call}}{the original function call.}
+#'  }
+#'
+#' @references
+#' Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+#' Nearest neighbor ensembles for functional data with interpretable feature selection.
+#' Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
 #'
 #' @examples
 #' # How to implement your own kernel function
@@ -57,6 +90,17 @@
 #'
 #' # prediction accuracy
 #' mean(pred1 == classes[test_inds])
+#'
+#' # create another model using an existing kernel function
+#' mod2 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+#'                     ker = "Ker.tri", h = 2)
+#'
+#' # calculate the model predictions
+#' pred2 = predict(mod1, newdata = ArrowHead[test_inds,], predict.type = "response")
+#'
+#' # prediction accuracy
+#' mean(pred2 == classes[test_inds])
+#' @seealso predict.classiKernel
 #' @export
 classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
                         metric = "Euclidean", ker = "Ker.norm",
@@ -83,8 +127,8 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
   assertIntegerish(nderiv, lower = 0L)
   assertFlag(derived)
   assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
-  assertChoice(ker, choices = ker.choices())
-  assertChoice(metric, choices = metric.choices())
+  assertChoice(ker, choices = kerChoices())
+  assertChoice(metric, choices = metricChoices())
 
 
   # check if data is evenly spaced  -> respace
@@ -130,6 +174,25 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 }
 
 
+#' predict a classiKernel object
+#'
+#' predict function for a classiKnn object.
+#'
+#' @param object [\code{classiKernel}]\cr
+#'   object of class classiKernel to get predictions from
+#' @param newdata [\code{data.frame}]\cr
+#'   (optional) new data to predict from with observations as rows. Do not derive this data,
+#'   this will be done automatically if required by the model. If \code{NULL},
+#'   the training data is predicted, currently without using a leave-one-out prediction.
+#' @param predict.type [\code{character(1)}]\cr
+#'   one of 'response' or 'prob', indicating the type of prediction. Choose
+#'   'response' to return a vector of length \code{nrow(newdata)} containing the
+#'   most predicted class.
+#'   Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
+#'   the probabilities for the classes as columns.
+#' @param ... [\code{list}]\cr
+#'   additional arguments to \link{computeDistMat}.
+#' @seealso classiKernel
 #' @export
 predict.classiKernel = function(object, newdata = NULL, predict.type = "response", ...) {
   # input checking
@@ -182,4 +245,25 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
     }
   }
   return(result)
+}
+
+#' @export
+print.classiKernel = function(x, ...) {
+  cat("\n")
+  cat("\t classiKernel object \n")
+  cat("\n")
+  cat("data: \n")
+  cat("", length(levels(x$classes)), "classes:", levels(x$classes), "\n")
+  cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
+  cat("algorithm: \n")
+  cat(" kernel =", x$ker, "\n")
+  cat(" k = ", x$knn, "\n")
+  cat(" nderiv =", x$nderiv, "\n")
+  cat("\n")
+}
+
+
+#' @export
+summary.classiKernel = function(object, ...) {
+  print(object, ...)
 }
