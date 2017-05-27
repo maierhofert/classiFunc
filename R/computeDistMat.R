@@ -5,12 +5,12 @@
 #' (semi-)metrics.
 #'
 #' @param x [\code{matrix}]\cr
-#'   matrix containing observations as rows
+#'   matrix containing the functional observations as rows.
 #' @param y [\code{matrix}]\cr
 #'   see \code{x}. The default \code{NULL} uses \code{y = x}.
 #' @param method [\code{character(1)}]\cr
 #'   character string describing the distance function to be used. For a full list
-#'   execute \code{\link{metric.choices}()}.
+#'   execute \code{\link{metricChoices}()}.
 #'  \describe{
 #'   \item{\code{Euclidean}}{equals \code{Lp} with \code{p = 2}. This is the default.}
 #'   \item{\code{Lp, Minkowski}}{the distance for an Lp-space, takes \code{p} as
@@ -32,30 +32,28 @@
 #'   of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
 #'   \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
 #'   and take the same default values.}
-#'   \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2}.
+#'   \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2},
+#'   i.e. \code{x[t1 * length(x)] - x[t2 * length(x)]} for every functional observation \code{x}.
 #'   The points \code{t1} and \code{t2} are the positions  in an evenly spaced sequence
 #'   from \code{0} to \code{1} of length \code{length(grid)} for which to compare the
 #'   jump height. The default values are \code{t1 = 0} and \code{t2 = 1}.}
 #'   \item{\code{globMax}}{the difference of the curves global maxima.}
 #'   \item{\code{globMin}}{the difference of the curves global minima.}
 #'   \item{\code{points}}{the mean absolute differences at certain observation
-#'   points \code{poi}, also  called "points of impact". These are specified as
-#'   a vector of indices of an evenly spaced sequence from \code{0}
-#'   to \code{1} of length \code{length(grid)}.
-#'   The default value is \code{seq(0, 1, length.out = length(grid))}, which results in the Manhattan
+#'   points \code{.poi}, also  called "points of impact". These are specified as
+#'   a vector \code{.poi} of arbitrary length with values between \code{0}
+#'   and \code{1}, encoding the the index of the points of observations.
+#'   The default value is \code{.poi = seq(0, 1, length.out = length(grid))}, which results in the Manhattan
 #'   distance.}
 #'   \item{\code{custom.metric}}{your own semimetric will be used. Specify your
 #'   own distance function in the argument \code{custom.metric}.}
 #'   \item{\code{amplitudeDistance,phaseDistance}}{The amplitude distance or
 #'   phase distance as described in
-#'   Srivastava and Klassen 2016, 'Functional and shape data analysis'
-#'   (http://link.springer.com/book/10.1007/978-1-4939-4020-2)
+#'   Srivastava and Klassen (2016).
 #'   }
 #'   \item{\code{FisherRao, elasticMetric}}{the elastic distance of the square
-#'   root velocity of the curves as described in
-#'   Srivastava etal 2011, 'Shape analysis of elastic curves in Euclidean spaces'
-#'   (\url{http://ieeexplore.ieee.org/abstract/document/5601739/}). This equates
-#'   to the Fisher Rao metric.}
+#'   root velocity of the curves as described in Srivastava and Klassen (2016).
+#'   This equates to the Fisher Rao metric.}
 #'   \item{\code{elasticDistance}}{weighted mean of the amplitude and the phase
 #'   distance using the implementation in \code{\link[fdasrvf]{elastic.distance}}.
 #'   Additional arguments are the numeric the penalization parameters \code{a,b,c}
@@ -74,9 +72,11 @@
 #'   encode the position of the points for which to compare the jump heights in
 #'   \code{method = "jump"} as numeric values between 0 and 1, see \code{dmin}.
 #' @param .poi [\code{numeric(1 to ncol(x))}]\cr
-#'   numeric vector of length between 1 and \code{ncol(x)} taking numeric values
+#'   numeric vector of length arbitrary length taking numeric values
 #'   between 0 and 1, denoting the
 #'   position of the points of interest for \code{method = "points"}.
+#'   The default value is \code{.poi = seq(0, 1, length.out = length(grid))},
+#'   which results in the Manhattan distance.
 #' @param custom.metric [\code{function(x, y, ...)}]\cr
 #'   a function specifying how to compute the distance between
 #'   two functional observations (= numeric vectors of the same length)
@@ -93,8 +93,16 @@
 #'   Default value is 0. Large values imply less (no) warping, small values
 #'   imply more warping.
 #'   Used for \code{method \%in\% c('elastic', 'SRV')}.
-#'
 #' @param ... additional parameters to the (semi-)metrics.
+#'
+#' @return a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the
+#'   distances of the functional observations contained in \code{x} and \code{y},
+#'   if \code{y} is specified. Otherwise a matrix containing the distances of all
+#'   functional observations within \code{x} to each other.
+#'
+#' @references
+#' Srivastava, A. and E. P. Klassen (2016). Functional and shape data analysis. Springer.
+#'
 #' @importFrom stats quantile
 #' @export
 computeDistMat = function(x, y = NULL,
@@ -110,9 +118,9 @@ computeDistMat = function(x, y = NULL,
                           a = NULL, b = NULL, c = NULL, lambda = 0,
                           ...) {
 
-  assertChoice(method, choices = metric.choices())
+  assertChoice(method, choices = metricChoices())
 
-  if (method %in% metric.choices(proxy.only = TRUE)) {
+  if (method %in% metricChoices(proxy.only = TRUE)) {
     return(as.matrix(proxy::dist(x, y, method = method, ...)))
   }
 
