@@ -5,13 +5,13 @@
 #' preprocessing needed in \code{\link{classiKnn}} and \code{\link{classiKernel}}.
 #' This is helpful to ensure that the data preprocessing (imputation of missing
 #' values, derivation) is carried out in exactly the same way for the
-#' train and the test set in \code{predict.classiKnn} and
+#' training and the test set in \code{predict.classiKnn} and
 #' \code{predict.classiKernel}.
 #'
 #' @param grid,nderiv,derived,evenly.spaced,no.missing,deriv.method see
 #' \code{\link{classiKnn}}
 #' @param ... additional arguments to fda::Data2fd
-#' @return pipeline function taking one argument \code{fdata}. The returned
+#' @return Pipeline function taking one argument \code{fdata}. The returned
 #' function carries out all the preprocessing needed for the calling model
 #' of class \code{\link{classiKnn}}.
 #'
