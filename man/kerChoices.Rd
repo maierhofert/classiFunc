@@ -2,7 +2,7 @@
 % Please edit documentation in R/kernelChoices.R
 \name{kerChoices}
 \alias{kerChoices}
-\title{Name all implemented kernel functions}
+\title{List the names of all implemented kernel functions}
 \usage{
 kerChoices()
 }

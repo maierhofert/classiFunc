@@ -2,7 +2,7 @@
 % Please edit documentation in R/metricChoices.R
 \name{metricChoices}
 \alias{metricChoices}
-\title{Name all metrics}
+\title{List the names of all metrics}
 \usage{
 metricChoices(proxy.only = FALSE)
 }

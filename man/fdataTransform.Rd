@@ -14,7 +14,7 @@ fdataTransform(grid, nderiv, derived, evenly.spaced, no.missing, deriv.method,
 \item{...}{additional arguments to fda::Data2fd}
 }
 \value{
-pipeline function taking one argument \code{fdata}. The returned
+Pipeline function taking one argument \code{fdata}. The returned
 function carries out all the preprocessing needed for the calling model
 of class \code{\link{classiKnn}}.
 }
@@ -24,6 +24,6 @@ concept. Creates a pipeline function to do all the
 preprocessing needed in \code{\link{classiKnn}} and \code{\link{classiKernel}}.
 This is helpful to ensure that the data preprocessing (imputation of missing
 values, derivation) is carried out in exactly the same way for the
-train and the test set in \code{predict.classiKnn} and
+training and the test set in \code{predict.classiKnn} and
 \code{predict.classiKernel}.
 }
