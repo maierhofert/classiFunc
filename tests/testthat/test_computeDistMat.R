@@ -4,7 +4,7 @@ context("computeDistMat")
 test_that("computeDistMat works for all specified metrics", {
   set.seed(123)
   dat = matrix(rnorm(n = 20), 5, byrow = TRUE)
-  mets = metric.choices()
+  mets = metricChoices()
   mets_no_add_params = mets[!mets %in% c("Minkowski", "Lp",
                                          "Mahalanobis",
                                          "fJaccard", "fuzzy_Jaccard",

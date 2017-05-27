@@ -105,13 +105,13 @@ pred = predict(m, newdata = ArrowHead[test_inds,])
 ```
 
 The Brier score optimal ensemble proposed in 
-[Fuchs etal. 2015](http://www.sciencedirect.com/science/article/pii/S0169743915001100),
+[Fuchs et al. (2015)](http://www.sciencedirect.com/science/article/pii/S0169743915001100),
 Nearest neighbor ensembles for functional data with 
 interpretable feature selection,
 can also be reproduced using the implementation in `mlr`.
 A newly implemented stacked learner aggregates the individual base learners 
 to an ensemble learner by creating a weighted mean of their individual predictions.
-Other ensemble learners can easily created.
+Other ensemble learners can easily be created.
 
 ```{r, eval = FALSE, results='asis'}
 
@@ -129,7 +129,7 @@ b.lrn3 = makeLearner("fdaclassif.classiKnn",
                      par.vals = list(metric = "globMax"), 
                      predict.type = "prob")
 
-# create an ensemble learner as porposed in Fuchs etal. 2015
+# create an ensemble learner as porposed in Fuchs et al. (2015)
 # the default uses leave-one-out CV to estimate the weights of the base learners as proposed in the original paper
 # set resampling to CV for faster run time
 ensemble.lrn = makeStackedLearner(base.learners = list(b.lrn1, b.lrn2, b.lrn3), 
