@@ -27,14 +27,14 @@ number of nearest neighbors to use in the k nearest neighbor algorithm.}
 character string specifying the (semi-)metric to be used.
 For a an overview of what is available see the
 \code{method} argument in \code{\link{computeDistMat}}. For a full list
-execute \code{\link{metric.choices}()}.}
+execute \code{\link{metricChoices}()}.}
 
 \item{nderiv}{[\code{integer(1)}]\cr
 order of derivation on which the metric shall be computed.
 The default is 0L.}
 
 \item{derived}{[\code{logical(1)}]\cr
-Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
+Is the data given in \code{fdata} already derived? Default is set to \code{FALSE},
 which will lead to numerical derivation if \code{nderiv >= 1L} by applying
 \code{\link[fda]{deriv.fd}} on a \code{\link[fda]{Data2fd}} representation of
 \code{fdata}.}
@@ -53,7 +53,7 @@ only used if \code{deriv.method = "custom.method"}.
 A function of functional observations
 \code{x} and \code{y} returning their distance.
 The default is the Euclidean distance.
-See how to implement your distance function in \code{\link[proxy]{dist}}}
+See how to implement your distance function in \code{\link[proxy]{dist}}.}
 
 \item{...}{further arguments to and from other methods. Hand over additional arguments to
 \code{\link{computeDistMat}}, usually additional arguments for the specified
@@ -95,10 +95,7 @@ following components:
 Creates an efficient k nearest neighbor estimator for functional data
 classification. Currently supported distance measures are all \code{metrics}
 implemented in \code{\link[proxy]{dist}}
-and all semimetrics suggested in
-Fuchs etal. 2015, Nearest neighbor ensembles for functional data with
-interpretable feature selection,
-(\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
+and all semimetrics suggested in Fuchs et al. (2015).
 Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
 }
 \examples{
@@ -114,11 +111,20 @@ test_inds = (1:nrow(Phoneme))[!(1:nrow(Phoneme)) \%in\% train_inds]
 # create functional data as matrix with observations as rows
 fdata = Phoneme[,!colnames(Phoneme) == "target"]
 
-# create 3 nearest neighbor classifier with Euclidean distance (default) of the
+# create k = 3 nearest neighbors classifier with Euclidean distance (default) of the
 # first order derivative of the data
 mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
                  nderiv = 1L, knn = 3L)
 
 # predict the model for the test set
 pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
+
+}
+\references{
+Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+Nearest neighbor ensembles for functional data with interpretable feature selection.
+Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
+}
+\seealso{
+\link{predict.classiKnn}
 }

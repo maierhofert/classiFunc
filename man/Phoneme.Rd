@@ -12,11 +12,11 @@
 Phoneme
 }
 \description{
-A dataset containing the audio files of english words.
+A data set containing the audio files of english words.
 }
 \details{
-This data set is a subsample of the data used in the paper Dual-domain
-Hierarchical Classification of Phonetic Time Series. Each series is extracted
+This data set is a subsample of the data used in Hamooni and Mueen (2014).
+Each series is extracted
 from the segmented audio collected from Google Translate, oxforddictionaries.com
 and the Merrriam-Webster online dictionary. Each of these sources have
 different features. Audio files collected from Google translate, Oxford, and
@@ -35,4 +35,9 @@ Phonetics Laboratory.
 }
 }
 
+\references{
+Hamooni, Hossein, and Mueen, Abdullah.
+"Dual-domain hierarchical classification of phonetic time series."
+Data Mining (ICDM), 2014 IEEE International Conference on. IEEE, 2014.
+}
 \keyword{datasets}

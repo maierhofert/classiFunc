@@ -22,20 +22,20 @@ numeric vector of length \code{ncol(fdata)} containing the grid on which the fun
 evaluated.}
 
 \item{h}{[numeric(1)]\cr
-the bandwidth of the kernel function. All kernel functions \code{ker} must be
-implemented to have bandwidth = 1. The bandwidth is controlled via
-\code{K(x) = ker(x/h)}.}
+controls the bandwidth of the kernel function. All kernel functions \code{ker} should be
+implemented to have bandwidth = 1. The bandwidth is controlled via \code{h}
+by using \code{K(x) = ker(x/h)} as the kernel function.}
 
 \item{metric}{[\code{character(1)}]\cr
 character string specifying the (semi-)metric to be used.
 For a an overview of what is available see the
 \code{method} argument in \code{\link{computeDistMat}}. For a full list
-execute \code{\link{metric.choices}()}.}
+execute \code{\link{metricChoices}()}.}
 
 \item{ker}{[numeric(1)]\cr
-character describing the kernel function to use. Admissible are
+character describing the kernel function to use. Available are
 amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
-For the full list execute \code{\link{ker.choices}()}.
+For the full list execute \code{\link{kerChoices}()}.
 The usage of customized kernel function is symbolized by
 \code{ker = "custom.ker"}. The customized function can be specified in
 \code{custom.ker}}
@@ -45,7 +45,7 @@ order of derivation on which the metric shall be computed.
 The default is 0L.}
 
 \item{derived}{[\code{logical(1)}]\cr
-Is the data given in \code{fdata} already derived? Defaults to \code{FALSE},
+Is the data given in \code{fdata} already derived? Default is set to \code{FALSE},
 which will lead to numerical derivation if \code{nderiv >= 1L} by applying
 \code{\link[fda]{deriv.fd}} on a \code{\link[fda]{Data2fd}} representation of
 \code{fdata}.}
@@ -64,12 +64,13 @@ only used if \code{deriv.method = "custom.method"}.
 A function of functional observations
 \code{x} and \code{y} returning their distance.
 The default is the Euclidean distance.
-See how to implement your distance function in \code{\link[proxy]{dist}}}
+See how to implement your distance function in \code{\link[proxy]{dist}}.}
 
 \item{custom.ker}{[function(u)]\cr
-customized kernel function. This has to a function with exactly one parameter
+customized kernel function. This has to be a function with exactly one parameter
 \code{u}, returning the numeric value of the kernel function
-\code{ker(u)}. This function is only used if \code{ker == "custom.ker"}.}
+\code{ker(u)}. This function is only used if \code{ker == "custom.ker"}.
+The bandwidth should be constantly equal to 1 and is controlled via \code{h}.}
 
 \item{...}{further arguments to and from other methods. Hand over additional arguments to
 \code{\link{computeDistMat}}, usually additional arguments for the specified
@@ -78,17 +79,44 @@ customized kernel function. This has to a function with exactly one parameter
 \code{\link{fdataTransform}} can be specified which will be passed on to
 \code{\link[fda]{Data2fd}}.}
 }
+\value{
+\code{classiKernel} returns an object of class \code{'classiKernel'}.
+This is a list containing  at least the
+following components:
+ \describe{
+  \item{\code{classes}}{a factor of length nrow(fdata) coding the response of
+  the training data set.}
+  \item{\code{fdata}}{the raw functional data as a matrix with the individual
+  observations as rows.}
+  \item{\code{proc.fdata}}{the preprocessed data (missing values interpolated,
+  derived and evenly spaced). This data is \code{this.fdataTransform(fdata)}.
+  See \code{this.fdataTransform} for more details.}
+  \item{\code{grid}}{numeric vector containing the grid on which \code{fdata}
+  is observed)}
+  \item{\code{h}}{numeric value giving the bandwidth to be used in the kernel function.}
+  \item{\code{ker}}{character encoding the kernel function to use.}
+  \item{\code{metric}}{character string coding the distance metric to be used
+  in \code{\link{computeDistMat}}.}
+  \item{\code{nderiv}}{integer giving the order of derivation that is applied
+  to fdata before computing the distances between the observations.}
+  \item{\code{this.fdataTransform}}{preprocessing function taking new data as
+  a matrix. It is used to transform \code{fdata} into \code{proc.fdata} and
+  is required to preprocess new data in order to predict it. This function
+  ensures, that preprocessing (derivation, respacing and interpolation of
+  missing values) is done in the exact same way for the original
+  training data set and future (test) data sets.}
+  \item{\code{call}}{the original function call.}
+ }
+}
 \description{
 Creates an efficient kernel estimator for functional data
 classification. Currently
 supported distance measures are all \code{metrics} implemented in \code{\link[proxy]{dist}}
-and all semimetrics suggested in
-Fuchs et al. 2015, Nearest neighbor ensembles for functional data with
-interpretable feature selection,
-(\url{http://www.sciencedirect.com/science/article/pii/S0169743915001100}).
-Additionally, all (semi-)metrics can be used on an arbitrary order of derivation.
+and all semimetrics suggested in Fuchs et al. (2015).
+Additionally, all (semi-)metrics can be used on a derivative of arbitrary
+order of the functional observations.
 For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
-are admissible as well as custom kernel functions.
+are available as well as custom kernel functions.
 }
 \examples{
 # How to implement your own kernel function
@@ -115,4 +143,22 @@ pred1 = predict(mod1, newdata = ArrowHead[test_inds,], predict.type = "response"
 
 # prediction accuracy
 mean(pred1 == classes[test_inds])
+
+# create another model using an existing kernel function
+mod2 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                    ker = "Ker.tri", h = 2)
+
+# calculate the model predictions
+pred2 = predict(mod1, newdata = ArrowHead[test_inds,], predict.type = "response")
+
+# prediction accuracy
+mean(pred2 == classes[test_inds])
+}
+\references{
+Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+Nearest neighbor ensembles for functional data with interpretable feature selection.
+Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
+}
+\seealso{
+predict.classiKernel
 }
