@@ -284,3 +284,52 @@ computeDistMat = function(x, y = NULL,
   }
 
 }
+
+#' @title Parallize computing a distance matrix for functional observations
+#' 
+#' @description 
+#'   Uses \code{\link{parallelMap}} to parallelize the computation of the distance
+#'   matrix. This is done by dividing the data into batches and computing
+#'   the distance matrix for each batch.
+#'   For details on distance computation see \code{\link{computeDistMat}}. 
+#' @inheritParams computeDistMat
+#' 
+#' @return a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the
+#'   distances of the functional observations contained in \code{x} and \code{y},
+#'   if \code{y} is specified. Otherwise a matrix containing the distances of all
+#'   functional observations within \code{x} to each other.
+#' @export
+parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
+  dmin = 0, dmax = 1,
+  dmin1 = 0, dmax1 = 1,
+  dmin2 = 0, dmax2 = 1,
+  t1 = 0, t2 = 1,
+  .poi = seq(0, 1, length.out = ncol(x)),
+  custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
+  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = 100) {
+
+  asCount(ncpus, positive = TRUE)
+  asCount(batch.size, positive = TRUE)
+
+  # Load required libraries on slave
+  pkgs = "proxy"
+  if (method == "dtwPath") {
+    pkgs = c(pkgs, "dtw")
+  } else if (method %in% c("FisherRao", "elasticMetric")) { 
+    pkgs = c(pkgs, "fdasrvf")
+  } else if (method %in% c("rucrdtw", "rucred")) {
+    pkgs = c(pkgs, "rucrdtw")
+  }
+  parallelMap::parallelLibrary(pkgs, master = FALSE)
+  
+  # Split data into batches
+  batches = split(seq_len(nrow(newdata)), ceiling(seq_len(nrow(newdata)) / batch.size))
+  
+  # Parallelize over batches
+  dists.list = parallelMap::parallelMap(fun = function(batch) {
+    do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
+      method = object$metric, custom.metric = object$custom.metric, ...),
+      object$call$...))
+  })
+  return(do.call("rbind", dists.list))
+}

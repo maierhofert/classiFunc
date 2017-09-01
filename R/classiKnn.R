@@ -188,7 +188,8 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
 #'
 #' @seealso classiKnn
 #' @export
-predict.classiKnn = function(object, newdata = NULL, predict.type = "response", ...) {
+predict.classiKnn = function(object, newdata = NULL, predict.type = "response",
+  , parallel = TRUE, ...) {
   # input checking
   if (!is.null(newdata)) {
     if (class(newdata) == "data.frame")
@@ -201,10 +202,18 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response", 
   # create distance metric
   # note, that additional arguments from the original model are handed over
   # to computeDistMat using object$call$...
-  dist.mat = do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
-                                              method = object$metric,
-                                              custom.metric = object$custom.metric, ...),
-                                         object$call$...))
+  if (parallel) {
+    dist.mat = do.call("parallelcomputeDistMat", c(list(x = object$proc.fdata,
+      y = newdata,
+      method = object$metric,
+      custom.metric = object$custom.metric, ...),
+      object$call$...))
+  } else {
+    dist.mat = do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
+      method = object$metric,
+      custom.metric = object$custom.metric, ...),
+      object$call$...))
+  })
 
   # matrix containing which nearest neighbor the training observation is
   # for the new observation
