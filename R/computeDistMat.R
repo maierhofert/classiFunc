@@ -306,7 +306,7 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   t1 = 0, t2 = 1,
   .poi = seq(0, 1, length.out = ncol(x)),
   custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
-  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = 100) {
+  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = 100, ...) {
 
   asCount(ncpus, positive = TRUE)
   asCount(batch.size, positive = TRUE)
@@ -323,13 +323,12 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   parallelMap::parallelLibrary(pkgs, master = FALSE)
   
   # Split data into batches
-  batches = split(seq_len(nrow(newdata)), ceiling(seq_len(nrow(newdata)) / batch.size))
+  batches = split(seq_len(nrow(y)), ceiling(seq_len(nrow(y)) / batch.size))
   
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
-    do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
-      method = object$metric, custom.metric = object$custom.metric, ...),
-      object$call$...))
-  })
+    do.call("computeDistMat", list(x = x, y = y[batch, ],
+      method = method, custom.metric = custom.metric, ...))
+  }, batches)
   return(do.call("rbind", dists.list))
 }

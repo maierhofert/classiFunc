@@ -5,7 +5,7 @@
 \title{predict a classiKnn object}
 \usage{
 \method{predict}{classiKnn}(object, newdata = NULL,
-  predict.type = "response", ...)
+  predict.type = "response", parallel = FALSE, ...)
 }
 \arguments{
 \item{object}{[\code{classiKnn}]\cr
