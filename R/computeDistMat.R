@@ -308,6 +308,9 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
   a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = 100, ...) {
 
+  if (!require("parallelMap")) {
+    stop(sprintf("Package %s missing, please install!", "paralleMap"))
+  }
   asCount(ncpus, positive = TRUE)
   asCount(batch.size, positive = TRUE)
 
