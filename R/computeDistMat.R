@@ -280,8 +280,8 @@ computeDistMat = function(x, y = NULL,
     }
     return(as.matrix(proxy::dist(x, y, method = el_dist, a = a, b = b, lambda = lambda)))
   }
-  
-  # Dynamic Time Warping Distance from rucrdtw package 
+
+  # Dynamic Time Warping Distance from rucrdtw package
   if (method %in% "rucrdtw") {
     ucrdtw = function(x, y, ...) {
       dist = rucrdtw::ucrdtw_vvr(x, y, ...)
@@ -301,14 +301,14 @@ computeDistMat = function(x, y = NULL,
 }
 
 #' @title Parallize computing a distance matrix for functional observations
-#' 
-#' @description 
+#'
+#' @description
 #'   Uses \code{\link{parallelMap}} to parallelize the computation of the distance
 #'   matrix. This is done by dividing the data into batches and computing
 #'   the distance matrix for each batch.
-#'   For details on distance computation see \code{\link{computeDistMat}}. 
+#'   For details on distance computation see \code{\link{computeDistMat}}.
 #' @inheritParams computeDistMat
-#' 
+#'
 #' @return a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the
 #'   distances of the functional observations contained in \code{x} and \code{y},
 #'   if \code{y} is specified. Otherwise a matrix containing the distances of all
@@ -321,28 +321,31 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   t1 = 0, t2 = 1,
   .poi = seq(0, 1, length.out = ncol(x)),
   custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
-  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = 100, ...) {
+  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = NULL, ...) {
 
   if (!require("parallelMap")) {
     stop(sprintf("Package %s missing, please install!", "paralleMap"))
   }
   asCount(ncpus, positive = TRUE)
+  if (is.null(batch.size)) {
+    batch.size = nrow(x) / ncpus
+  }
   asCount(batch.size, positive = TRUE)
 
   # Load required libraries on slave
   pkgs = "proxy"
   if (method == "dtwPath") {
     pkgs = c(pkgs, "dtw")
-  } else if (method %in% c("FisherRao", "elasticMetric")) { 
+  } else if (method %in% c("FisherRao", "elasticMetric")) {
     pkgs = c(pkgs, "fdasrvf")
   } else if (method %in% c("rucrdtw", "rucred")) {
     pkgs = c(pkgs, "rucrdtw")
   }
   parallelMap::parallelLibrary(pkgs, master = FALSE)
-  
+
   # Split data into batches
-  batches = split(seq_len(nrow(y)), ceiling(seq_len(nrow(y)) / batch.size))
-  
+  batches = split(seq_len(nrow(x)), ceiling(seq_len(nrow(x)) / batch.size))
+
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
     do.call("computeDistMat", list(x = x, y = y[batch, ],
