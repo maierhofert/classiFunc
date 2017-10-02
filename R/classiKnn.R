@@ -203,7 +203,7 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response",
   # note, that additional arguments from the original model are handed over
   # to computeDistMat using object$call$...
   if (parallel) {
-    parallelExport("object", "newdata")
+    # parallelExport("object", "newdata")
     dist.mat = do.call("parallelComputeDistMat", c(list(x = object$proc.fdata,
       y = newdata,
       method = object$metric,

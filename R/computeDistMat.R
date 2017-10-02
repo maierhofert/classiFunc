@@ -235,8 +235,6 @@ computeDistMat = function(x, y = NULL,
   # elastic distance from the square root velocity framework,
   # see Srivastava etal 2011
   # I do not know how this is related to the elastic metric,
-
-
   # this method returns the phase and the amplitude distance
   # I do not know how it relates to the elastic metric
   if (method %in% c("elasticDistance")) {
@@ -281,6 +279,23 @@ computeDistMat = function(x, y = NULL,
       return(weighted_el_d)
     }
     return(as.matrix(proxy::dist(x, y, method = el_dist, a = a, b = b, lambda = lambda)))
+  }
+  
+  # Dynamic Time Warping Distance from rucrdtw package 
+  if (method %in% "rucrdtw") {
+    ucrdtw = function(x, y, ...) {
+      dist = rucrdtw::ucrdtw_vvr(x, y, ...)
+      dist$distance
+    }
+    return(as.matrix(proxy::dist(x, y, method = ucrdtw, ...)))
+  }
+  # Euclidean Distance from rucrdtw package
+  if (method %in% "rucred") {
+    ucred = function(x, y, ...) {
+      dist = rucrdtw::ucred_vv(x, y, ...)
+      dist$distance
+    }
+    return(as.matrix(proxy::dist(x, y, method = ucred, ...)))
   }
 
 }
