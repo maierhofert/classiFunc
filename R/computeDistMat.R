@@ -284,16 +284,14 @@ computeDistMat = function(x, y = NULL,
   # Dynamic Time Warping Distance from rucrdtw package
   if (method %in% "rucrdtw") {
     ucrdtw = function(x, y, ...) {
-      dist = rucrdtw::ucrdtw_vvr(x, y, ...)
-      dist$distance
+      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, ...)$distance
     }
     return(as.matrix(proxy::dist(x, y, method = ucrdtw, ...)))
   }
   # Euclidean Distance from rucrdtw package
   if (method %in% "rucred") {
     ucred = function(x, y, ...) {
-      dist = rucrdtw::ucred_vv(x, y, ...)
-      dist$distance
+      rucrdtw::ucred_vv(data = matrix(x, nrow = 1L), query = y, skip = TRUE, ...)$distance
     }
     return(as.matrix(proxy::dist(x, y, method = ucred, ...)))
   }
@@ -324,24 +322,24 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = NULL, ...) {
 
   if (!require("parallelMap")) {
-    stop(sprintf("Package %s missing, please install!", "paralleMap"))
+    stop("Package paralleMap missing, please install!")
   }
   asCount(ncpus, positive = TRUE)
   if (is.null(batch.size)) {
-    batch.size = nrow(x) / ncpus
+    batch.size = ceiling(nrow(x) / ncpus)
   }
   asCount(batch.size, positive = TRUE)
 
   # Load required libraries on slave
-  pkgs = "proxy"
-  if (method == "dtwPath") {
-    pkgs = c(pkgs, "dtw")
+  parallelMap::parallelLibrary("proxy", master = FALSE)
+  if (method %in% c("dtwPath", "dtw", "DTW")) {
+    parallelMap::parallelLibrary("dtw", master = FALSE)
   } else if (method %in% c("FisherRao", "elasticMetric")) {
-    pkgs = c(pkgs, "fdasrvf")
+    parallelMap::parallelLibrary("fdasrvf", master = FALSE)
   } else if (method %in% c("rucrdtw", "rucred")) {
-    pkgs = c(pkgs, "rucrdtw")
+    parallelMap::parallelLibrary("rucrdtw", master = FALSE)
   }
-  parallelMap::parallelLibrary(pkgs, master = FALSE)
+
 
   # Split data into batches
   batches = split(seq_len(nrow(x)), ceiling(seq_len(nrow(x)) / batch.size))

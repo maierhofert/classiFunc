@@ -29,6 +29,6 @@ metricChoices = function(proxy.only = FALSE) {
              "amplitudeDistance", "phaseDistance",
              "FisherRao", "elasticMetric",
              "elasticDistance",
-             "dtwPath", "rucrdtw", "rucred"))
+             "dtwPath", "rucrdtw", "rucred", "dtwPath"))
   }
 }
