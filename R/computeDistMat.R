@@ -340,14 +340,13 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
     parallelMap::parallelLibrary("rucrdtw", master = FALSE)
   }
 
-
   # Split data into batches
   batches = split(seq_len(nrow(x)), ceiling(seq_len(nrow(x)) / batch.size))
 
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
-    do.call("computeDistMat", list(x = x, y = y[batch, ],
+    do.call("computeDistMat", list(x = x, y = x[batch, ],
       method = method, custom.metric = custom.metric, ...))
   }, batches)
-  return(do.call("rbind", dists.list))
+  return(do.call("cbind", dists.list))
 }
