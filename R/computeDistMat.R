@@ -283,15 +283,15 @@ computeDistMat = function(x, y = NULL,
 
   # Dynamic Time Warping Distance from rucrdtw package
   if (method %in% "rucrdtw") {
-    ucrdtw = function(x, y, ...) {
-      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, ...)$distance
+    ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
+      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
     }
     return(as.matrix(proxy::dist(x, y, method = ucrdtw, ...)))
   }
   # Euclidean Distance from rucrdtw package
   if (method %in% "rucred") {
     ucred = function(x, y, ...) {
-      rucrdtw::ucred_vv(data = matrix(x, nrow = 1L), query = y, skip = TRUE, ...)$distance
+      rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
     }
     return(as.matrix(proxy::dist(x, y, method = ucred, ...)))
   }
