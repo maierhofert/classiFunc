@@ -345,7 +345,7 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
 
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
-    do.call("computeDistMat", list(x = x, y = x[batch, ],
+    do.call("computeDistMat", list(x = x, y = x[batch, , drop = FALSE],
       method = method, custom.metric = custom.metric, ...))
   }, batches)
   return(do.call("cbind", dists.list))
