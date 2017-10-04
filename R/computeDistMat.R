@@ -286,14 +286,26 @@ computeDistMat = function(x, y = NULL,
     ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
       rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
     }
-    return(as.matrix(proxy::dist(x, y, method = ucrdtw, ...)))
+    pr_DB$set_entry(FUN=ucrdtw, names = "rucrdtw",
+      loop=TRUE, type="metric",
+      description="Dynamic Time Warping from UCR",
+      reference="To be added",
+      formula="minimum of sum(x[xw[i]]-y[yw[i]]) over all monotonic xw, yw");
+
+    return(as.matrix(proxy::dist(x, y, method = "rucrdtw", ...)))
   }
   # Euclidean Distance from rucrdtw package
   if (method %in% "rucred") {
     ucred = function(x, y, ...) {
       rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
     }
-    return(as.matrix(proxy::dist(x, y, method = ucred, ...)))
+    pr_DB$set_entry(FUN=ucred, names = "rucred",
+      loop=TRUE, type="metric",
+      description="Dynamic Time Warping from UCR",
+      reference="To be added",
+      formula="minimum of sum(x[xw[i]]-y[yw[i]]) over all monotonic xw, yw");
+
+    return(as.matrix(proxy::dist(x, y, method = "rucred", ...)))
   }
 
 }
