@@ -319,14 +319,15 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   t1 = 0, t2 = 1,
   .poi = seq(0, 1, length.out = ncol(x)),
   custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
-  a = NULL, b = NULL, c = NULL, lambda = 0, ncpus = 1L, batch.size = NULL, ...) {
+  a = NULL, b = NULL, c = NULL, lambda = 0, batches = 1, batch.size = NULL, ...) {
 
   if (!require("parallelMap")) {
     stop("Package paralleMap missing, please install!")
   }
-  asCount(ncpus, positive = TRUE)
+  nrw = nrow(x)
+  assert_number(batches, lower = 1, upper = nrw)
   if (is.null(batch.size)) {
-    batch.size = ceiling(nrow(x) / ncpus)
+    batch.size = ceiling(nrw / batches)
   }
   asCount(batch.size, positive = TRUE)
 
@@ -340,8 +341,8 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
     parallelMap::parallelLibrary("rucrdtw", master = FALSE)
   }
 
-  # Split data into batches
-  batches = split(seq_len(nrow(x)), ceiling(seq_len(nrow(x)) / batch.size))
+  # Split data into #batches of size batch.size
+  batches = split(seq_len(nrw), ceiling(seq_len(nrw) / batch.size))
 
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
