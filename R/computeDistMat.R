@@ -282,23 +282,25 @@ computeDistMat = function(x, y = NULL,
   }
 
   # Dynamic Time Warping Distance from rucrdtw package
-  if (method %in% "rucrdtw") {
+  if (method == "rucrdtw") {
+    requirePackages("rucrdtw")
     ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
       rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
     }
     pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
       loop = TRUE, type = "metric",
       description = "Dynamic Time Warping from UCR",
-      reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R. The Journal of Open Source
-        Software URL http://doi.org/10.21105/joss.00100;
-        Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences under dynamic time
-        warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
+      reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R.
+        The Journal of Open Source Software URL http://doi.org/10.21105/joss.00100;
+        Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences
+        under dynamic time warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
       formula = "minimum of sum(x[xw[i]]-y[yw[i]]) over all monotonic xw, yw");
 
     return(as.matrix(proxy::dist(x, y, method = "rucrdtw", ...)))
   }
   # Euclidean Distance from rucrdtw package
-  if (method %in% "rucred") {
+  if (method == "rucred") {
+    requirePackages("rucrdtw")
     ucred = function(x, y, ...) {
       rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
     }
@@ -307,8 +309,8 @@ computeDistMat = function(x, y = NULL,
       description = "Euclidean Distance from UCR",
       reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R. The Journal of Open Source
         Software URL http://doi.org/10.21105/joss.00100;
-      Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences under dynamic time
-      warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
+        Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences under dynamic time
+        warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
       formula = "sqrt(sum((x-y)^2))");
 
     return(as.matrix(proxy::dist(x, y, method = "rucred", ...)))
@@ -337,12 +339,14 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   t1 = 0, t2 = 1,
   .poi = seq(0, 1, length.out = ncol(x)),
   custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
-  a = NULL, b = NULL, c = NULL, lambda = 0, batches = 1, batch.size = NULL, ...) {
+  a = NULL, b = NULL, c = NULL, lambda = 0, batches = 1L, batch.size = NULL, ...) {
 
-  if (!require("parallelMap")) {
-    stop("Package paralleMap missing, please install!")
+  requirePackages("parallelMap")
+  # If y is NULL use x
+  if (is.null(y)) {
+    y = x
   }
-  nrw = nrow(x)
+  nrw = nrow(y)
   assert_number(batches, lower = 1, upper = nrw)
   if (is.null(batch.size)) {
     batch.size = ceiling(nrw / batches)
@@ -364,7 +368,7 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
 
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
-    do.call("computeDistMat", list(x = x, y = x[batch, , drop = FALSE],
+    do.call("computeDistMat", list(x = x, y = y[batch, , drop = FALSE],
       method = method, custom.metric = custom.metric, ...))
   }, batches)
   return(do.call("cbind", dists.list))
