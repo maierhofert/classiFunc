@@ -194,7 +194,8 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 #'   additional arguments to \link{computeDistMat}.
 #' @seealso classiKernel
 #' @export
-predict.classiKernel = function(object, newdata = NULL, predict.type = "response", ...) {
+predict.classiKernel = function(object, newdata = NULL, predict.type = "response",
+  parallel = FALSE, ...) {
   # input checking
   if (!is.null(newdata)) {
     if (class(newdata) == "data.frame")
@@ -207,7 +208,12 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
   # create distance metric
   # note, that additional arguments from the original model are handed over
   # to computeDistMat using object$call$...
-  dist.mat = do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
+  if (parallel) {
+    distfun = "parallelComputeDistMat"
+  } else {
+    distfun = "computeDistMat"
+  }
+  dist.mat = do.call(distfun, c(list(x = object$proc.fdata, y = newdata,
                                               method = object$metric,
                                               custom.metric = object$custom.metric, ...),
                                          object$call$...))
