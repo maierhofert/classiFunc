@@ -332,14 +332,7 @@ computeDistMat = function(x, y = NULL,
 #'   if \code{y} is specified. Otherwise a matrix containing the distances of all
 #'   functional observations within \code{x} to each other.
 #' @export
-parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
-  dmin = 0, dmax = 1,
-  dmin1 = 0, dmax1 = 1,
-  dmin2 = 0, dmax2 = 1,
-  t1 = 0, t2 = 1,
-  .poi = seq(0, 1, length.out = ncol(x)),
-  custom.metric = function(x, y, lp = 2, ...) {return(sum(abs(x - y) ^ lp) ^ (1 / lp))},
-  a = NULL, b = NULL, c = NULL, lambda = 0, batches = 1L, batch.size = NULL, ...) {
+parallelComputeDistMat = function(x, y = NULL, method = "Euclidean", batches = 1L, batch.size = NULL, ...) {
 
   requirePackages("parallelMap")
   # If y is NULL use x
@@ -354,7 +347,6 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   asCount(batch.size, positive = TRUE)
 
   # Load required libraries on slave
-  parallelMap::parallelLibrary("proxy", master = FALSE)
   if (method %in% c("dtwPath", "dtw", "DTW")) {
     parallelMap::parallelLibrary("dtw", master = FALSE)
   } else if (method %in% c("FisherRao", "elasticMetric")) {
@@ -369,7 +361,7 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean",
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
     do.call("computeDistMat", list(x = x, y = y[batch, , drop = FALSE],
-      method = method, custom.metric = custom.metric, ...))
+      method = method, ...))
   }, batches)
   return(do.call("cbind", dists.list))
 }
