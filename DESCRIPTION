@@ -18,8 +18,7 @@ Suggests:
     testthat,
     knitr,
     rmarkdown,
-    parallelMap,
-    rucrdtw
+    parallelMap
 Imports:
     BBmisc (>= 1.11),
     checkmate (>= 1.8.2),
@@ -29,4 +28,5 @@ Imports:
     fdasrvf,
     proxy,
     stats
+LinkingTo: rucrdtw
 VignetteBuilder: knitr

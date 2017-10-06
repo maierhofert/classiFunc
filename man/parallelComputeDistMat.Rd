@@ -4,12 +4,8 @@
 \alias{parallelComputeDistMat}
 \title{Parallize computing a distance matrix for functional observations}
 \usage{
-parallelComputeDistMat(x, y = NULL, method = "Euclidean", dmin = 0,
-  dmax = 1, dmin1 = 0, dmax1 = 1, dmin2 = 0, dmax2 = 1, t1 = 0,
-  t2 = 1, .poi = seq(0, 1, length.out = ncol(x)),
-  custom.metric = function(x, y, lp = 2, ...) {     return(sum(abs(x -
-  y)^lp)^(1/lp)) }, a = NULL, b = NULL, c = NULL, lambda = 0,
-  ncpus = 1L, batch.size = 100)
+parallelComputeDistMat(x, y = NULL, method = "Euclidean", batches = 1L,
+  ...)
 }
 \arguments{
 \item{x}{[\code{matrix}]\cr
@@ -74,85 +70,11 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
  allowed before calculating the elastic distance. The default is 1.
 }}}
 
-\item{dmin}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
+\item{batches}{[\code{integer(1)}]\cr
+Number of batches to split data into. The distance computation is then carried out
+for each batch.}
 
-\item{dmax}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
-
-\item{dmin1}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
-
-\item{dmax1}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
-
-\item{dmin2}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
-
-\item{dmax2}{[\code{integer(1)}]\cr
-encode the indizes used to define subspaces for
-\code{method \%in\% c("shortEuclidean", "relAreas")}
-as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
-1 encodes \code{grid[length(grid)]}.}
-
-\item{t1}{[\code{numeric(1)}]\cr
-encode the position of the points for which to compare the jump heights in
-\code{method = "jump"} as numeric values between 0 and 1, see \code{dmin}.}
-
-\item{t2}{[\code{numeric(1)}]\cr
-encode the position of the points for which to compare the jump heights in
-\code{method = "jump"} as numeric values between 0 and 1, see \code{dmin}.}
-
-\item{.poi}{[\code{numeric(1 to ncol(x))}]\cr
-numeric vector of length arbitrary length taking numeric values
-between 0 and 1, denoting the
-position of the points of interest for \code{method = "points"}.
-The default value is \code{.poi = seq(0, 1, length.out = length(grid))},
-which results in the Manhattan distance.}
-
-\item{custom.metric}{[\code{function(x, y, ...)}]\cr
-a function specifying how to compute the distance between
-two functional observations (= numeric vectors of the same length)
-\code{x} and \code{y}. It can handle additional arguments in \code{...}.
-The default is the Euclidean distance (equals Minkwoski distance
-with \code{lp = 2}). Used for \code{method = "custom.metric"}.}
-
-\item{a}{[\code{numeric(1)}]\cr
-weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
-in a semimetric that combines them by addition.
-Used for \code{method == 'elasticDistance'}.}
-
-\item{b}{[\code{numeric(1)}]\cr
-weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
-in a semimetric that combines them by addition.
-Used for \code{method == 'elasticDistance'}.}
-
-\item{c}{[\code{numeric(1)}]\cr
-weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
-in a semimetric that combines them by addition.
-Used for \code{method == 'elasticDistance'}.}
-
-\item{lambda}{[\code{numeric(1)}]\cr
-penalization parameter for the warping allowed before calculating the
-elastic distance.
-Default value is 0. Large values imply less (no) warping, small values
-imply more warping.
-Used for \code{method \%in\% c('elastic', 'SRV')}.}
+\item{...}{additional parameters to the (semi-)metrics.}
 }
 \value{
 a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the

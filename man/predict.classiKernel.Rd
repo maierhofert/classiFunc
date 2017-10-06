@@ -5,7 +5,7 @@
 \title{predict a classiKernel object}
 \usage{
 \method{predict}{classiKernel}(object, newdata = NULL,
-  predict.type = "response", ...)
+  predict.type = "response", parallel = FALSE, ...)
 }
 \arguments{
 \item{object}{[\code{classiKernel}]\cr

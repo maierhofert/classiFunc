@@ -103,20 +103,21 @@
 #' @references
 #' Srivastava, A. and E. P. Klassen (2016). Functional and shape data analysis. Springer.
 #'
+#' @useDynLib rucrdtw
 #' @importFrom stats quantile
 #' @export
 computeDistMat = function(x, y = NULL,
-                          method = "Euclidean",
-                          dmin = 0, dmax = 1,
-                          dmin1 = 0, dmax1 = 1,
-                          dmin2 = 0, dmax2 = 1,
-                          t1 = 0, t2 = 1,
-                          .poi = seq(0, 1, length.out = ncol(x)),
-                          custom.metric = function(x, y, lp = 2, ...) {
-                            return(sum(abs(x - y) ^ lp) ^ (1 / lp))
-                          },
-                          a = NULL, b = NULL, c = NULL, lambda = 0,
-                          ...) {
+  method = "Euclidean",
+  dmin = 0, dmax = 1,
+  dmin1 = 0, dmax1 = 1,
+  dmin2 = 0, dmax2 = 1,
+  t1 = 0, t2 = 1,
+  .poi = seq(0, 1, length.out = ncol(x)),
+  custom.metric = function(x, y, lp = 2, ...) {
+    return(sum(abs(x - y) ^ lp) ^ (1 / lp))
+  },
+  a = NULL, b = NULL, c = NULL, lambda = 0,
+  ...) {
 
   assertChoice(method, choices = metricChoices())
 
@@ -142,7 +143,7 @@ computeDistMat = function(x, y = NULL,
     dmin = round(quantile(1:ncol(x), probs = dmin))
     dmax = round(quantile(1:ncol(x), probs = dmax))
     return(computeDistMat(x[, dmin:dmax],
-                          y[, dmin:dmax], "Euclidean"))
+      y[, dmin:dmax], "Euclidean"))
   }
 
   if (method == "mean") {
@@ -197,7 +198,7 @@ computeDistMat = function(x, y = NULL,
 
   if (method == "points") {
     assertNumeric(.poi, lower = 0, upper = 1, any.missing = FALSE,
-                  min.len = 1L, max.len = ncol(x), unique = TRUE)
+      min.len = 1L, max.len = ncol(x), unique = TRUE)
     # convert to index
     .poi = round(quantile(1:ncol(x), probs = .poi))
     return(computeDistMat(x[,.poi], y[,.poi], method = "Manhattan"))
@@ -218,12 +219,12 @@ computeDistMat = function(x, y = NULL,
   # amplitude distance
   if (method %in% c("amplitudeDistance")) {
     return(computeDistMat(x, y, method = "elasticDistance",
-                          a = 1, b = 0, lambda = lambda))
+      a = 1, b = 0, lambda = lambda))
   }
   # phase distance
   if (method %in% c("phaseDistance")) {
     return(computeDistMat(x, y, method = "elasticDistance",
-                          a = 0, b = 1, lambda = lambda))
+      a = 0, b = 1, lambda = lambda))
   }
   # TODO check if this is mathematically correct
   # Fisher-Rao metric
@@ -245,8 +246,8 @@ computeDistMat = function(x, y = NULL,
     assertNumeric(lambda, len = 1L)
     if (lambda < 0)
       warning(paste("Please do not specify lambda as < 0",
-                    "It think it does not make sense.",
-                    "The execution continues with your specified value."))
+        "It think it does not make sense.",
+        "The execution continues with your specified value."))
 
     # handling default values
     # TODO: As I do not know how this relates to the elastic metric,
@@ -273,8 +274,8 @@ computeDistMat = function(x, y = NULL,
     # elastic distance function
     el_dist = function(x, y, a, b, lambda) {
       el_d = fdasrvf::elastic.distance(x, y,
-                                       time = 1:length(x),
-                                       lambda = lambda)
+        time = 1:length(x),
+        lambda = lambda)
       weighted_el_d = a ^ 2 * el_d$Dy + b ^ 2 * el_d$Dx
       return(weighted_el_d)
     }
@@ -285,7 +286,7 @@ computeDistMat = function(x, y = NULL,
   if (method == "rucrdtw") {
     requirePackages("rucrdtw")
     ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
-      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
+      .Call("rucrdtw_ucred_vv", x, y, skip = TRUE, PACKAGE = "rucrdtw", ...)$distance
     }
     pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
       loop = TRUE, type = "metric",
@@ -301,8 +302,8 @@ computeDistMat = function(x, y = NULL,
   # Euclidean Distance from rucrdtw package
   if (method == "rucred") {
     requirePackages("rucrdtw")
-    ucred = function(x, y, ...) {
-      rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
+    ucred = function(x, y) {
+      .Call("rucrdtw_ucred_vv", x, y, skip = TRUE, PACKAGE = "rucrdtw")$distance
     }
     pr_DB$set_entry(FUN = ucred, names = "rucred",
       loop = TRUE, type = "metric",
@@ -313,7 +314,7 @@ computeDistMat = function(x, y = NULL,
         warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
       formula = "sqrt(sum((x-y)^2))");
 
-    return(as.matrix(proxy::dist(x, y, method = "rucred", ...)))
+    return(as.matrix(proxy::dist(x, y, method = "rucred", ..., PACKAGE = "rucrdtw")))
   }
 
 }
@@ -326,27 +327,28 @@ computeDistMat = function(x, y = NULL,
 #'   the distance matrix for each batch.
 #'   For details on distance computation see \code{\link{computeDistMat}}.
 #' @inheritParams computeDistMat
+#' @param batches [\code{integer(1)}]\cr
+#'   Number of batches to split data into. The distance computation is then carried out
+#'   for each batch.
 #'
 #' @return a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the
 #'   distances of the functional observations contained in \code{x} and \code{y},
 #'   if \code{y} is specified. Otherwise a matrix containing the distances of all
 #'   functional observations within \code{x} to each other.
 #' @export
-parallelComputeDistMat = function(x, y = NULL, method = "Euclidean", batches = 1L, batch.size = NULL, ...) {
+parallelComputeDistMat = function(x, y = NULL, method = "Euclidean", batches = 1L, ...) {
 
   requirePackages("parallelMap")
   # If y is NULL use x
   if (is.null(y)) {
     y = x
   }
-  nrw = nrow(y)
-  assert_number(batches, lower = 1, upper = nrw)
-  if (is.null(batch.size)) {
-    batch.size = ceiling(nrw / batches)
-  }
-  asCount(batch.size, positive = TRUE)
 
-  # Load required libraries on slave
+  # Compute batch.size
+  assertNumber(batches, lower = 1L, upper = nrow(y))
+  batch.size = ceiling(nrow(y) / batches)
+
+  # Load required libraries on slave(s)
   if (method %in% c("dtwPath", "dtw", "DTW")) {
     parallelMap::parallelLibrary("dtw", master = FALSE)
   } else if (method %in% c("FisherRao", "elasticMetric")) {
@@ -355,8 +357,8 @@ parallelComputeDistMat = function(x, y = NULL, method = "Euclidean", batches = 1
     parallelMap::parallelLibrary("rucrdtw", master = FALSE)
   }
 
-  # Split data into #batches of size batch.size
-  batches = split(seq_len(nrw), ceiling(seq_len(nrw) / batch.size))
+  # Split data into batches of size batch.size
+  batches = split(seq_len(nrow(y)), ceiling(seq_len(nrow(y)) / batch.size))
 
   # Parallelize over batches
   dists.list = parallelMap::parallelMap(fun = function(batch) {
