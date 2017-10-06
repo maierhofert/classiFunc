@@ -153,6 +153,13 @@ pred2 = predict(mod1, newdata = ArrowHead[test_inds,], predict.type = "response"
 
 # prediction accuracy
 mean(pred2 == classes[test_inds])
+\dontrun{
+# Parallelize across 2 CPU's
+library(parallelMap)
+parallelStartSocket(2L) # parallelStartMulticore for Linux
+predict(mod1, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+parallelStop()
+}
 }
 \references{
 Fuchs, K., J. Gertheiss, and G. Tutz (2015):

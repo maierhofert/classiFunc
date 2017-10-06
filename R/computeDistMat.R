@@ -328,7 +328,7 @@ computeDistMat = function(x, y = NULL,
 #'   For details on distance computation see \code{\link{computeDistMat}}.
 #' @inheritParams computeDistMat
 #' @param batches [\code{integer(1)}]\cr
-#'   Number of batches to split data into. The distance computation is then carried out
+#'   Number of roughly equal-sized batches to split data into. The distance computation is then carried out
 #'   for each batch.
 #'
 #' @return a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the

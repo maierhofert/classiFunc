@@ -23,6 +23,11 @@ most predicted class.
 Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
 the probabilities for the classes as columns.}
 
+\item{parallel}{[\code{logical(1)}]\cr
+Should the prediction be parallelized?
+Uses \code{\link[parallelMap]{parallelMap}} for
+parallelization. See \code{...} for further arguments.}
+
 \item{...}{[\code{list}]\cr
 additional arguments to \link{computeDistMat}.}
 }

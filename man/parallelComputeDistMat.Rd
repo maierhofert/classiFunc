@@ -71,7 +71,7 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
 }}}
 
 \item{batches}{[\code{integer(1)}]\cr
-Number of batches to split data into. The distance computation is then carried out
+Number of roughly equal-sized batches to split data into. The distance computation is then carried out
 for each batch.}
 
 \item{...}{additional parameters to the (semi-)metrics.}

@@ -104,6 +104,14 @@
 #' # predict the model for the test set
 #' pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
 #'
+#' \dontrun{
+#' # Parallelize across 2 CPU's
+#' library(parallelMap)
+#' parallelStartSocket(2L) # parallelStartMulticore for Linux
+#' predict(mod, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+#' parallelStop()
+#' }
+#'
 #' @seealso \link{predict.classiKnn}
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
@@ -183,8 +191,12 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
 #'   most predicted class.
 #'   Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
 #'   the probabilities for the classes as columns.
+#' @param parallel [\code{logical(1)}]\cr
+#'   Should the prediction be parallelized?
+#'   Uses \code{\link[parallelMap]{parallelMap}} for
+#'   parallelization. See \code{...} for further arguments.
 #' @param ... [\code{list}]\cr
-#'   additional arguments to \link{computeDistMat}.
+#'   additional arguments to \link[classiFunc]{computeDistMat}.
 #'
 #' @seealso classiKnn
 #' @export

@@ -100,6 +100,13 @@
 #'
 #' # prediction accuracy
 #' mean(pred2 == classes[test_inds])
+#' \dontrun{
+#' # Parallelize across 2 CPU's
+#' library(parallelMap)
+#' parallelStartSocket(2L) # parallelStartMulticore for Linux
+#' predict(mod1, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+#' parallelStop()
+#' }
 #' @seealso predict.classiKernel
 #' @export
 classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
@@ -190,6 +197,10 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 #'   most predicted class.
 #'   Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
 #'   the probabilities for the classes as columns.
+#' @param parallel [\code{logical(1)}]\cr
+#'   Should the prediction be parallelized?
+#'   Uses \code{\link[parallelMap]{parallelMap}} for
+#'   parallelization. See \code{...} for further arguments.
 #' @param ... [\code{list}]\cr
 #'   additional arguments to \link{computeDistMat}.
 #' @seealso classiKernel
