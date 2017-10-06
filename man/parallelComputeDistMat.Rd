@@ -90,7 +90,7 @@ a matrix of dimensions \code{nrow(x)} by \code{nrow(y)} containing the
   functional observations within \code{x} to each other.
 }
 \description{
-Uses \code{\link{parallelMap}} to parallelize the computation of the distance
+Uses \code{\link[parallelMap]{parallelMap}} to parallelize the computation of the distance
   matrix. This is done by dividing the data into batches and computing
   the distance matrix for each batch.
   For details on distance computation see \code{\link{computeDistMat}}.

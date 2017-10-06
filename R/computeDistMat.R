@@ -110,7 +110,6 @@
 #' @references
 #' Srivastava, A. and E. P. Klassen (2016). Functional and shape data analysis. Springer.
 #'
-#' @useDynLib rucrdtw
 #' @importFrom stats quantile
 #' @export
 computeDistMat = function(x, y = NULL,
@@ -293,7 +292,7 @@ computeDistMat = function(x, y = NULL,
   if (method == "rucrdtw") {
     requirePackages("rucrdtw")
     ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
-      .Call("rucrdtw_ucred_vv", x, y, skip = TRUE, PACKAGE = "rucrdtw", ...)$distance
+      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
     }
     pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
       loop = TRUE, type = "metric",
@@ -309,15 +308,17 @@ computeDistMat = function(x, y = NULL,
   # Euclidean Distance from rucrdtw package
   if (method == "rucred") {
     requirePackages("rucrdtw")
-    ucred = function(x, y) {
-      .Call("rucrdtw_ucred_vv", x, y, skip = TRUE, PACKAGE = "rucrdtw")$distance
+    ucred = function(x, y, ...) {
+      rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
     }
     pr_DB$set_entry(FUN = ucred, names = "rucred",
       loop = TRUE, type = "metric",
       description = "Euclidean Distance from UCR",
-      reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R. The Journal of Open Source
+      reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R.
+        The Journal of Open Source
         Software URL http://doi.org/10.21105/joss.00100;
-        Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences under dynamic time
+        Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences
+        under dynamic time
         warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
       formula = "sqrt(sum((x-y)^2))");
 
@@ -329,7 +330,7 @@ computeDistMat = function(x, y = NULL,
 #' @title Parallize computing a distance matrix for functional observations
 #'
 #' @description
-#'   Uses \code{\link{parallelMap}} to parallelize the computation of the distance
+#'   Uses \code{\link[parallelMap]{parallelMap}} to parallelize the computation of the distance
 #'   matrix. This is done by dividing the data into batches and computing
 #'   the distance matrix for each batch.
 #'   For details on distance computation see \code{\link{computeDistMat}}.
