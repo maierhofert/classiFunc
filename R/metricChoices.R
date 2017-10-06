@@ -28,6 +28,7 @@ metricChoices = function(proxy.only = FALSE) {
              "points", "custom.metric",
              "amplitudeDistance", "phaseDistance",
              "FisherRao", "elasticMetric",
-             "elasticDistance"))
+             "elasticDistance",
+             "dtwPath", "rucrdtw", "rucred"))
   }
 }

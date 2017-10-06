@@ -5,7 +5,7 @@
 \title{predict a classiKernel object}
 \usage{
 \method{predict}{classiKernel}(object, newdata = NULL,
-  predict.type = "response", ...)
+  predict.type = "response", parallel = FALSE, ...)
 }
 \arguments{
 \item{object}{[\code{classiKernel}]\cr
@@ -22,6 +22,11 @@ one of 'response' or 'prob', indicating the type of prediction. Choose
 most predicted class.
 Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
 the probabilities for the classes as columns.}
+
+\item{parallel}{[\code{logical(1)}]\cr
+Should the prediction be parallelized?
+Uses \code{\link[parallelMap]{parallelMap}} for
+parallelization. See \code{...} for further arguments.}
 
 \item{...}{[\code{list}]\cr
 additional arguments to \link{computeDistMat}.}

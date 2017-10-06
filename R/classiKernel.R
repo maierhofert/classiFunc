@@ -100,6 +100,13 @@
 #'
 #' # prediction accuracy
 #' mean(pred2 == classes[test_inds])
+#' \dontrun{
+#' # Parallelize across 2 CPU's
+#' library(parallelMap)
+#' parallelStartSocket(2L) # parallelStartMulticore for Linux
+#' predict(mod1, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+#' parallelStop()
+#' }
 #' @seealso predict.classiKernel
 #' @export
 classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
@@ -190,11 +197,16 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 #'   most predicted class.
 #'   Choose 'prob' to return a matrix with \code{nrow(newdata)} rows containing
 #'   the probabilities for the classes as columns.
+#' @param parallel [\code{logical(1)}]\cr
+#'   Should the prediction be parallelized?
+#'   Uses \code{\link[parallelMap]{parallelMap}} for
+#'   parallelization. See \code{...} for further arguments.
 #' @param ... [\code{list}]\cr
 #'   additional arguments to \link{computeDistMat}.
 #' @seealso classiKernel
 #' @export
-predict.classiKernel = function(object, newdata = NULL, predict.type = "response", ...) {
+predict.classiKernel = function(object, newdata = NULL, predict.type = "response",
+  parallel = FALSE, ...) {
   # input checking
   if (!is.null(newdata)) {
     if (class(newdata) == "data.frame")
@@ -207,7 +219,12 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
   # create distance metric
   # note, that additional arguments from the original model are handed over
   # to computeDistMat using object$call$...
-  dist.mat = do.call("computeDistMat", c(list(x = object$proc.fdata, y = newdata,
+  if (parallel) {
+    distfun = "parallelComputeDistMat"
+  } else {
+    distfun = "computeDistMat"
+  }
+  dist.mat = do.call(distfun, c(list(x = object$proc.fdata, y = newdata,
                                               method = object$metric,
                                               custom.metric = object$custom.metric, ...),
                                          object$call$...))

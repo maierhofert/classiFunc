@@ -119,6 +119,14 @@ mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
 # predict the model for the test set
 pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
 
+\dontrun{
+# Parallelize across 2 CPU's
+library(parallelMap)
+parallelStartSocket(2L) # parallelStartMulticore for Linux
+predict(mod, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+parallelStop()
+}
+
 }
 \references{
 Fuchs, K., J. Gertheiss, and G. Tutz (2015):
