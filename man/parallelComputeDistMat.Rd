@@ -67,8 +67,15 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
  The default values are \code{a = 1/2, b = 1}.
  Alternatively \code{c} denotes the ratio of \code{2*a} and \code{b}.
  \code{lambda} is the additional penalization parameter for the warping
- allowed before calculating the elastic distance. The default is 1.
-}}}
+ allowed before calculating the elastic distance. The default is 1.}
+\item{\code{rucrdtw, rucred}}{Dynamic Time Warping Distance and Euclidean Distance
+ from package \code{\link{rucrdtw}}. Implemented in Boersch-Supan (2016).
+ rucrdtw: Fast time series subsequence
+ search in R. The Journal of Open Source Software URL http://doi.org/10.21105/joss.00100 and
+ originally described in Rakthanmanon et al. (2012). Searching and mining trillions
+ of time series subsequences under dynamic time
+ warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576}
+ }}
 
 \item{batches}{[\code{integer(1)}]\cr
 Number of roughly equal-sized batches to split data into. The distance computation is then carried out
