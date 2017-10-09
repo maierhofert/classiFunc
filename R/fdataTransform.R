@@ -25,7 +25,7 @@ fdataTransform = function(grid, nderiv, derived, evenly.spaced,
   } else if (evenly.spaced & no.missing & deriv.method == "base.diff") {
     # fast derivation using base::diff
     return(function(fdata) {
-      for(i in 1:nderiv) {
+      for (i in 1:nderiv) {
         fdata = t(apply(fdata, 1, diff))
       }
       fdata
