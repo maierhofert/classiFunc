@@ -49,8 +49,21 @@ vignette: >
 ```
    It is also possible to predict all models in parallel. This can lead to significant speed ups for models using computationally intensive distance metrics.
 ```{r, eval = FALSE, results='asis'}
-# TODO write code
-# TODO export parallel functionality to mlr
+# Parallelize across 2 CPUs
+library("parallelMap")
+
+# set up parallelization
+parallelStartSocket(cpus = 2L) # parallelStartMulticore(cpus = 2L) for Linux
+
+# predict in parallel
+# specify parallel = TRUE and batchsize > 1L for parallelization
+pred.parallel = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
+
+# clean up parallelization
+parallelStop()
+
+# results do not change
+all(pred.parallel == pred.prob)
 
 ```
 
@@ -134,9 +147,9 @@ The Brier score optimal ensemble proposed in
 Nearest neighbor ensembles for functional data with 
 interpretable feature selection,
 can also be reproduced using the implementation in `mlr`.
-A newly implemented stacked learner aggregates the individual base learners 
+A newly implemented stacked learner (`method = 'bs.optimal.ensemble'`) aggregates the individual base learners 
 to an ensemble learner by creating a weighted mean of their individual predictions.
-Other ensemble learners can easily be created.
+Other ensemble learners can easily be created using other stacked learners implemented in `mlr`.
 
 ```{r, eval = FALSE, results='asis'}
 
@@ -154,30 +167,32 @@ b.lrn3 = makeLearner("classif.classiFunc.knn",
                      par.vals = list(metric = "globMax"), 
                      predict.type = "prob")
 
+set.seed(123)
+
 # create an ensemble learner as porposed in Fuchs et al. (2015)
 # the default uses leave-one-out CV to estimate the weights of the base learners as proposed in the original paper
-# set resampling to CV for faster run time
+# set resampling to CV for faster run time.
 ensemble.lrn = makeStackedLearner(base.learners = list(b.lrn1, b.lrn2, b.lrn3), 
                                   predict.type = "prob", 
-                                  resampling = makeResampleDesc("CV", iters = 5L),
+                                  resampling = makeResampleDesc("CV", iters = 10L),
                                   method = "classif.bs.optimal")
 
-# create another ensemble learner
+# create another ensemble learner using random forest as a super learner
 rf.ensemble.lrn = makeStackedLearner(base.learners = list(b.lrn1, b.lrn2, b.lrn3), 
                                      super.learner = "classif.randomForest",
                                      predict.type = "prob", 
                                      method = "stack.cv")
 
-# train the model on the training data task
+# train the models on the training data task
 ensemble.m = train(ensemble.lrn, task)
 rf.ensemble.m = train(rf.ensemble.lrn, task)
 
 # predict the test data set
-ensemble.pred = predict(ensemble.m, newdata = ArrowHead[test_inds,])
+ensemble.pred = predict(ensemble.m, newdata = fArrowHead[test_inds,])
 rf.ensemble.pred = predict(rf.ensemble.m, newdata = fArrowHead[test_inds,])
 
 # compute mean misclassification error
 measureMMCE(ArrowHead[test_inds, "target"], ensemble.pred$data$response)
 measureMMCE(ArrowHead[test_inds, "target"], rf.ensemble.pred$data$response)
 
-```
+ ```
