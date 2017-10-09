@@ -122,7 +122,7 @@ pred = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
 \dontrun{
 # Parallelize across 2 CPU's
 library(parallelMap)
-parallelStartSocket(2L) # parallelStartMulticore for Linux
+parallelStartSocket(cpus = 2L) # parallelStartMulticore(cpus = 2L) for Linux
 predict(mod, newdata =  fdata[test_inds,], predict.type = "prob", parallel = TRUE, batches = 2L)
 parallelStop()
 }
