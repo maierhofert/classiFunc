@@ -58,7 +58,7 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
  own distance function in the argument \code{custom.metric}.}
  \item{\code{amplitudeDistance,phaseDistance}}{The amplitude distance or
  phase distance as described in
- Srivastava and Klassen (2016).
+ Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
  }
  \item{\code{FisherRao, elasticMetric}}{the elastic distance of the square
  root velocity of the curves as described in Srivastava and Klassen (2016).
@@ -72,12 +72,8 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
  \code{lambda} is the additional penalization parameter for the warping
  allowed before calculating the elastic distance. The default is 1.}
 \item{\code{rucrdtw, rucred}}{Dynamic Time Warping Distance and Euclidean Distance
- from package \code{\link{rucrdtw}}. Implemented in Boersch-Supan (2016).
- rucrdtw: Fast time series subsequence
- search in R. The Journal of Open Source Software URL http://doi.org/10.21105/joss.00100 and
- originally described in Rakthanmanon et al. (2012). Searching and mining trillions
- of time series subsequences under dynamic time
- warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576}
+ from package \code{\link{rucrdtw}}. Implemented in Boersch-Supan (2016) and
+ originally described in Rakthanmanon et al. (2012).}
  }}
 
 \item{dmin, dmax, dmin1, dmax1, dmin2, dmax2}{[\code{integer(1)}]\cr
@@ -130,5 +126,14 @@ This mainly internal function offers a unified framework to acces the
 (semi-)metrics.
 }
 \references{
-Srivastava, A. and E. P. Klassen (2016). Functional and shape data analysis. Springer.
+Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
+
+Boersch-Supan (2016). rucrdtw: Fast time series subsequence
+search in R. The Journal of Open Source Software
+URL http://doi.org/10.21105/joss.00100
+
+Rakthanmanon, Thanawin, et al.
+"Searching and mining trillions of time series subsequences under dynamic time warping."
+Proceedings of the 18th ACM SIGKDD international conference on Knowledge discovery and data mining.
+ACM, 2012.
 }
