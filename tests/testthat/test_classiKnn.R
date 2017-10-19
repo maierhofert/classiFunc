@@ -88,6 +88,37 @@ test_that("classiKnn works for custom semimetrics", {
 
 })
 
+test_that("classiKnn works for DTI data set (contains missing values)", {
+  data("DTI")
+  classes = DTI[, "case"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(DTI), size = 0.8 * nrow(DTI), replace = FALSE)
+  test_inds = (1:nrow(DTI))[!(1:nrow(DTI)) %in% train_inds]
+
+  DTI = DTI[, !colnames(DTI) == "target"]
+
+  # fdata = DTI[train_inds,"cca"]
+  mod1 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"])
+  mod2 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"],
+                   nderiv = 1L, knn = 3L)
+
+
+  pred1 = predict(mod1, predict.type = "prob")
+  checkmate::expect_matrix(pred1, any.missing = FALSE,
+                           nrows = nrow(mod1$fdata),
+                           ncols = length(levels(mod1$classes)))
+
+  pred2 = predict(mod2, newdata = ArrowHead[train_inds, "cca"], predict.type = "response")
+  checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
+
+  pred3 = predict(mod2, newdata = ArrowHead[1, "cca"], predict.type = "response")
+  checkmate::expect_factor(pred3, any.missing = FALSE, levels = levels(mod2$classes))
+})
+
+
+
+
 test_that("classiKnn works for newly implemented semimetrics from Fuchs etal", {
   data("ArrowHead")
   classes = ArrowHead[,"target"]
