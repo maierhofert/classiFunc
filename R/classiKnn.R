@@ -149,12 +149,11 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
 
   # create a model specific preprocessing function for the data
   # here the data will be derived, respaced equally and missing values will be filled
-  this.fdataTransform = fdataTransform(# fdata = fdata,
-    grid = grid,
-    nderiv = nderiv, derived = derived,
-    evenly.spaced = evenly.spaced,
-    no.missing = no.missing,
-    deriv.method = deriv.method, ...)
+  this.fdataTransform = fdataTransform(grid = grid,
+                                       nderiv = nderiv, derived = derived,
+                                       evenly.spaced = evenly.spaced,
+                                       no.missing = no.missing,
+                                       deriv.method = deriv.method, ...)
   proc.fdata = this.fdataTransform(fdata)
 
   # delete the custom.metric function from output if not needed
