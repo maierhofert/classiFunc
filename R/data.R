@@ -103,7 +103,7 @@ NULL
 ##'
 ##' Data and description was reformatted from the \code{\link[fda]{fda}} package.
 ##'
-##' @name Growth
+##' @name Growth_irregular
 ##' @docType data
 ##' @format A list made up of \describe{
 ##' \item{ID}{Factor of length 93 containing the subject IDs}
@@ -121,5 +121,25 @@ NULL
 ##' Tuddenham, R. D., and Snyder, M. M. (1954)
 ##' "Physical growth of California boys and girls from birth to age 18",
 ##'  University of California Publications in Child Development, 1, 183-364.
+##' @seealso Growth
 NULL
 
+##' Berkeley Growth Study Data (regular grid)
+##'
+##' A data frame containing the heights of 39 boys and 54 girls from age 1 to 18,
+##' the ages at which they were collected.
+##'
+##'
+##' Data and description was reformatted from the \code{\link[fda]{fda}} package
+##' to be observed on a regular grid in one year steps.
+##'
+##' @name Growth
+##' @docType data
+##' @format A list made up of \describe{
+##' \item{ID}{Factor of length 93 containing the subject IDs}
+##' \item{sex}{Factor encoding the sex of children with values in \code{c(`male`, `female`)}}
+##' \item{height}{A 93 x 31 matrix giving the height in cm of 93 children at 31 ages}
+##' }
+##'  @inheritSection Growth_irregular references
+##'  @seealso Growth_irregular
+NULL
