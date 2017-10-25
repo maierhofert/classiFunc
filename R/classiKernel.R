@@ -139,11 +139,11 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 
 
   # check if data is evenly spaced  -> respace
-  evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)],
-                                      length.out = length(grid)))
+  evenly.spaced = isTRUE(all.equal(grid, seq(grid[1], grid[length(grid)],
+                                             length.out = length(grid)),
+                                   check.attributes = FALSE))
   no.missing = !checkmate::anyMissing(fdata)
 
-  # TODO write better warning message
   if (!no.missing) {
     warning("There are missing values in fdata. They will be filled using a spline representation!")
   }
