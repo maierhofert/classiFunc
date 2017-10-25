@@ -15,7 +15,7 @@
 #'     implemented to have bandwidth = 1. The bandwidth is controlled via \code{h}
 #'     by using \code{K(x) = ker(x/h)} as the kernel function.
 #' @param ker [numeric(1)]\cr
-#'     character describing the kernel function to use. Available are
+#'     character string describing the kernel function to use. Available are
 #'     amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
 #'     For the full list execute \code{\link{kerChoices}()}.
 #'     The usage of customized kernel function is symbolized by
