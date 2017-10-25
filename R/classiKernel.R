@@ -110,7 +110,7 @@
 #' @seealso predict.classiKernel
 #' @export
 classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
-                        metric = "Euclidean", ker = "Ker.norm",
+                        metric = "L2", ker = "Ker.norm",
                         nderiv = 0L, derived = FALSE,
                         deriv.method = "base.diff",
                         custom.metric = function(x, y, ...) {

@@ -40,7 +40,7 @@
 #' only used if \code{deriv.method = "custom.method"}.
 #' A function of functional observations
 #' \code{x} and \code{y} returning their distance.
-#' The default is the Euclidean distance.
+#' The default is the L2 distance.
 #' See how to implement your distance function in \code{\link[proxy]{dist}}.
 #' @param ...
 #' further arguments to and from other methods. Hand over additional arguments to
@@ -96,7 +96,7 @@
 #' # create functional data as matrix with observations as rows
 #' fdata = Phoneme[,!colnames(Phoneme) == "target"]
 #'
-#' # create k = 3 nearest neighbors classifier with Euclidean distance (default) of the
+#' # create k = 3 nearest neighbors classifier with L2 distance (default) of the
 #' # first order derivative of the data
 #' mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
 #'                  nderiv = 1L, knn = 3L)
@@ -115,7 +115,7 @@
 #' @seealso \link{predict.classiKnn}
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
-                     metric = "Euclidean", nderiv = 0L, derived = FALSE,
+                     metric = "L2", nderiv = 0L, derived = FALSE,
                      deriv.method = "base.diff",
                      custom.metric = function(x, y, ...) {
                        return(sqrt(sum((x - y) ^ 2)))
