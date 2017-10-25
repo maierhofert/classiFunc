@@ -99,9 +99,10 @@ test_that("classiKnn works for DTI data set (contains missing values)", {
   DTI = DTI[, !colnames(DTI) == "target"]
 
   # fdata = DTI[train_inds,"cca"]
-  mod1 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"])
-  mod2 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"],
-                   nderiv = 1L, knn = 3L)
+  expect_warning({mod1 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"])})
+  expect_warning({mod2 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"],
+                   nderiv = 1L, knn = 3L)})
+
 
 
   pred1 = predict(mod1, predict.type = "prob")
@@ -118,21 +119,8 @@ test_that("classiKnn works for DTI data set (contains missing values)", {
 
 
 test_that("classiKnn works for growth data set (contains irregular grid)", {
-  data("growth", package = "fda")
-  growth_mat = cbind(growth$hgtm, growth$hgtf)
-  Growth = list(ID = colnames(growth_mat),
-                sex = factor(c(rep("male", 39), rep("female", 54))),
-                age_grid = growth$age,
-                height = t(growth_mat))
-  # Growth$height = t(growth_mat)
-  # str(Growth)
-
-  save(Growth, file = "data/Growth.rda")
-  # TODO FIXME there is a probklem with age
-  rm(Growth)
-
-  data(Growth, package = "classiFunc")
-  str(Growth)
+  data(Growth_irregular, package = "classiFunc")
+  Growth = Growth_irregular
   classes = Growth$sex
 
   set.seed(123)
@@ -140,10 +128,11 @@ test_that("classiKnn works for growth data set (contains irregular grid)", {
   test_inds = (1:length(classes))[!(1:length(classes)) %in% train_inds]
 
   # fdata = DTI[train_inds,"cca"]
-  mod1 = classiKnn(classes = classes[train_inds], fdata = Growth$height[train_inds,])
-  mod2 = classiKnn(classes = classes[train_inds], fdata = Growth$height[train_inds,],
+  mod1 = classiKnn(classes = classes[train_inds], grid = Growth$age_grid,
+                   fdata = Growth$height[train_inds,])
+  mod2 = classiKnn(classes = classes[train_inds], grid = Growth$age_grid,
+                   fdata = Growth$height[train_inds,],
                    nderiv = 1L, knn = 3L)
-
 
   pred1 = predict(mod1, predict.type = "prob")
   checkmate::expect_matrix(pred1, any.missing = FALSE,
