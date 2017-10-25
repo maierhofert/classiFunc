@@ -4,8 +4,8 @@
 \alias{classiKernel}
 \title{Create a kernel estimator for functional data classification}
 \usage{
-classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1,
-  metric = "Euclidean", ker = "Ker.norm", nderiv = 0L, derived = FALSE,
+classiKernel(classes, fdata, grid = 1:ncol(fdata), h = 1, metric = "L2",
+  ker = "Ker.norm", nderiv = 0L, derived = FALSE,
   deriv.method = "base.diff", custom.metric = function(x, y, ...) {    
   return(sqrt(sum((x - y)^2))) }, custom.ker = function(u) {    
   return(dnorm(u)) }, ...)
@@ -33,7 +33,7 @@ For a an overview of what is available see the
 execute \code{\link{metricChoices}()}.}
 
 \item{ker}{[numeric(1)]\cr
-character describing the kernel function to use. Available are
+character string describing the kernel function to use. Available are
 amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
 For the full list execute \code{\link{kerChoices}()}.
 The usage of customized kernel function is symbolized by
@@ -63,7 +63,7 @@ high order derivatives.}
 only used if \code{deriv.method = "custom.method"}.
 A function of functional observations
 \code{x} and \code{y} returning their distance.
-The default is the Euclidean distance.
+The default is the L2 distance.
 See how to implement your distance function in \code{\link[proxy]{dist}}.}
 
 \item{custom.ker}{[function(u)]\cr
