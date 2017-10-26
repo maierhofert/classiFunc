@@ -110,10 +110,10 @@ test_that("classiKnn works for DTI data set (contains missing values)", {
                            nrows = nrow(mod1$fdata),
                            ncols = length(levels(mod1$classes)))
 
-  pred2 = predict(mod2, newdata = ArrowHead[train_inds, "cca"], predict.type = "response")
+  pred2 = predict(mod2, newdata = DTI[train_inds, "cca"], predict.type = "response")
   checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
 
-  pred3 = predict(mod2, newdata = ArrowHead[1, "cca"], predict.type = "response")
+  pred3 = predict(mod2, newdata = DTI[1, "cca"], predict.type = "response")
   checkmate::expect_factor(pred3, any.missing = FALSE, levels = levels(mod2$classes))
 })
 

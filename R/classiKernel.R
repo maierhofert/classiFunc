@@ -238,7 +238,7 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
   # Apply distance function after dividing by bandwidth
   dist.kernel = apply(dist.mat / object$h, c(1, 2), this.ker)
 
-  raw.result = aggregate(dist.kernel, by = list(classes = object$classes), sum, drop = FALSE)
+  raw.result = aggregate(dist.kernel, by = list(classes = object$classes), sum, na.rm = TRUE, drop = FALSE)
 
   if (predict.type == "response") {
     # return class with highest probability
@@ -255,7 +255,7 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
       names(result) = raw.result$classes
     } else {
       result = t(apply(raw.result[, -1], 2, function(x) {
-        if (sum(x) > 0) x / sum(x)
+        if (sum(x, na.rm = TRUE) > 0) x / sum(x)
         else rep(1 / length(x), length(x)) # if all ker(dist(x,y)) == 0
       }))
       colnames(result) = raw.result$classes
