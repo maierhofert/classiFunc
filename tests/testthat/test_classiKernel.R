@@ -63,7 +63,7 @@ test_that("classiKernel works for DTI data set (contains missing values)", {
   # fdata = DTI[train_inds,"cca"]
   expect_warning({mod1 = classiKernel(classes = classes[train_inds], fdata = DTI[train_inds, "cca"])})
   expect_warning({mod2 = classiKernel(classes = classes[train_inds], fdata = DTI[train_inds, "cca"],
-                                      h = 10)})
+                                      h = 10000)})
 
 
 
@@ -72,8 +72,15 @@ test_that("classiKernel works for DTI data set (contains missing values)", {
                            nrows = nrow(mod1$fdata),
                            ncols = length(levels(mod1$classes)))
 
-  pred2 = predict(mod2, newdata = DTI[train_inds, "cca"], predict.type = "response")
-  checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
+  pred2 = predict(mod2, newdata = DTI[train_inds, "cca"], predict.type = "prob")
+  checkmate::expect_matrix(pred2, any.missing = FALSE,
+                           nrows = nrow(mod1$fdata),
+                           ncols = length(levels(mod1$classes)))
+
+  pred3 = predict(mod2, newdata = DTI[train_inds, "cca"], predict.type = "response")
+  # all predicted classes must be prevalent class, because h is huge
+  checkmate::assert_true(all(pred3 == 1))
+  checkmate::expect_factor(pred3, any.missing = FALSE, levels = levels(mod2$classes))
 
 })
 
