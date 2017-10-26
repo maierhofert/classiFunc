@@ -22,9 +22,12 @@ fdataTransform = function(grid, nderiv, derived, evenly.spaced,
     # original data can be used if no derivation or filling of missing values
     # or respacing is necessary
     return(function(fdata) fdata)
-  } else if (evenly.spaced & no.missing & deriv.method == "base.diff") {
+  } else if (evenly.spaced & deriv.method == "base.diff") {
     # fast derivation using base::diff
     return(function(fdata) {
+      if (!no.missing) {
+        fdata = t(apply(fdata, 1, zoo::na.spline))
+      }
       for (i in 1:nderiv) {
         fdata = t(apply(fdata, 1, diff))
       }
@@ -33,7 +36,12 @@ fdataTransform = function(grid, nderiv, derived, evenly.spaced,
   } else {
     # create a preprocessing function
     return(function(fdata){
-      # get basis representation, fill NAs and derive the data
+      # get basis representation,
+      # fill NAs (FIXME, this does not work, used else if instead)
+      # and derive the data
+      if (!no.missing) {
+        fdata = t(apply(fdata, 1, zoo::na.spline))
+      }
       fda.fdata = fda::Data2fd(argvals = grid, t(fdata), ...)
       if (!(derived | nderiv == 0L)) {
         fda.fdata = fda::deriv.fd(fda.fdata, nderiv = nderiv)

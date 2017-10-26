@@ -29,5 +29,6 @@ Imports:
     fdasrvf,
     proxy,
     rucrdtw,
-    stats
+    stats,
+    zoo
 VignetteBuilder: knitr
