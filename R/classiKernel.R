@@ -150,7 +150,7 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 
   # create a model specific preprocessing function for the data
   # here the data will be derived, respaced equally and missing values will be filled
-  this.fdataTransform = fdataTransform(fdata = fdata, grid = grid,
+  this.fdataTransform = fdataTransform(grid = grid,
                                        nderiv = nderiv, derived = derived,
                                        evenly.spaced = evenly.spaced,
                                        no.missing = no.missing,
