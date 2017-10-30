@@ -7,10 +7,10 @@
 \format{A data frame made up of \describe{
 \item{cca}{A 382 x 93
 matrix of fractional anisotropy tract profiles from the corpus
-callosum;}
+callosum containing missing values;}
 \item{rcst}{A 382 x 55 matrix
 of fractional anisotropy tract profiles from the right corticospinal
-tract;}
+tract containing missing values;}
 \item{ID}{Numeric vector of subject ID numbers;}
 \item{visit}{Numeric vector of the subject-specific visit
 numbers;}
