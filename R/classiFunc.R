@@ -27,6 +27,7 @@
 #'
 #' @author
 #' Thomas Maierhofer
+#' Florian Pfisterer
 #'
 #' @rdname classiFunc
 #' @name classiFunc
