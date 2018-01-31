@@ -12,15 +12,15 @@ test_that("classiKernel works for arrow head data set", {
 
   mod1 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,])
   mod2 = classiKernel(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
-                      nderiv = 1L, h = 5)
+                      nderiv = 1L, h = 1)
 
 
-  pred1 = predict(mod1, predict.type = "prob")
+  pred1 = predict(mod1, newdata = ArrowHead[train_inds,], predict.type = "prob")
   checkmate::expect_matrix(pred1, any.missing = FALSE,
                            nrows = nrow(mod1$fdata),
                            ncols = length(levels(mod1$classes)))
 
-  pred2 = predict(mod2, newdata = ArrowHead[train_inds,], predict.type = "response")
+  pred2 = predict(mod1, newdata = ArrowHead[test_inds,], predict.type = "response")
   checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
 
   pred3 = predict(mod2, newdata = ArrowHead[1,], predict.type = "response")
@@ -51,7 +51,8 @@ test_that("classiKernel works for different Kernels", {
 })
 
 test_that("classiKernel works for DTI data set (contains missing values)", {
-  data("DTI")
+  data("DTI_original")
+  DTI = DTI_original
   classes = DTI[, "case"]
 
   set.seed(123)
