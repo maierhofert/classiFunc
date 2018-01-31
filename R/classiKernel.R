@@ -274,7 +274,7 @@ print.classiKernel = function(x, ...) {
   cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
   cat("algorithm: \n")
   cat(" kernel =", x$ker, "\n")
-  cat(" k = ", x$knn, "\n")
+  cat(" h = ", x$h, "\n")
   cat(" nderiv =", x$nderiv, "\n")
   cat("\n")
 }
