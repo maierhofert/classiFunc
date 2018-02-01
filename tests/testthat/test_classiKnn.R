@@ -89,7 +89,8 @@ test_that("classiKnn works for custom semimetrics", {
 })
 
 test_that("classiKnn works for DTI data set (contains missing values)", {
-  data("DTI")
+  data("DTI_original")
+  DTI = DTI_original
   classes = DTI[, "case"]
 
   set.seed(123)
