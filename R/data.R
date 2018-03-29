@@ -189,3 +189,30 @@ NULL
 ##'  @inheritSection Growth_irregular references
 ##'  @seealso Growth_irregular
 NULL
+
+
+##' Beetle/Fly Data
+##'
+##' Classification of Beetle and Fly outlines.
+##'
+##'
+##' MPEG-7 CE Shape-1 Part B is a database of binary images developed for testing
+##' MPEG-7 shape descriptors, and is available free online
+##' (http://www.dabi.temple.edu/~shape/MPEG7/dataset.html). It is used for testing
+##' contour/image and skeleton-based descriptors. Classes of images vary broadly,
+##' and include classes that are similar in shape to one another. There are 20
+##' instances of each class, and 60 classes in total. We have extracted the outlines
+##' of these images and mapped them into 1-D series of distances to the centre.
+##' Beetle/Fly is the problem of distinguishing between an outline of a beetle and a fly
+##'
+##' @section Format A data frame made up of:
+##' \describe{
+##' \item{att0 to att511}{Functional observation of outline.}
+##' \item{target}{Factor encoding if outline is from a beetle (1) or a fly (2).}
+##' }
+##'
+##' @references Hills J, Lines J, Baranauskas E, Mapp J, Bagnall A (2014).
+##' "Classifcation of time series by shapelet transformation."
+##' Data Mining and Knowledge Discovery, 28(4), 851-881.
+##' URL http://timeseriesclassification.com/description.php?Dataset=BeetleFly
+"BeetleFly"

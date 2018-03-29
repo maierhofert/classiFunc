@@ -26,4 +26,5 @@ Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
 }
 \author{
 Thomas Maierhofer
+Florian Pfisterer
 }
