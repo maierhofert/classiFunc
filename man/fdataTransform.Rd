@@ -11,7 +11,7 @@ fdataTransform(grid, nderiv, derived, evenly.spaced, no.missing, deriv.method,
 \item{grid, nderiv, derived, evenly.spaced, no.missing, deriv.method}{see
 \code{\link{classiKnn}}}
 
-\item{...}{additional arguments to fda::Data2fd}
+\item{...}{additional arguments to fda::smooth.basis}
 }
 \value{
 Pipeline function taking one argument \code{fdata}. The returned

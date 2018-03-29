@@ -10,7 +10,7 @@
 #'
 #' @param grid,nderiv,derived,evenly.spaced,no.missing,deriv.method see
 #' \code{\link{classiKnn}}
-#' @param ... additional arguments to fda::Data2fd
+#' @param ... additional arguments to fda::smooth.basis
 #' @return Pipeline function taking one argument \code{fdata}. The returned
 #' function carries out all the preprocessing needed for the calling model
 #' of class \code{\link{classiKnn}}.
