@@ -120,7 +120,7 @@
 #' Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
 #'
 #' @importFrom stats quantile
-#' @importFrom rucrdtw ucrdtw_vv
+#' @importFrom rucrdtw ucrdtw_vv ucred_vv
 #' @export
 computeDistMat = function(x, y = NULL,
   method = "Euclidean",
