@@ -13,9 +13,13 @@ knitr::opts_chunk$set(
 ```
 
 # classiFunc
-[![Travis-CI Build Status](https://travis-ci.org/r-lib/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc)
-<!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc) -->
-[![Rdoc](https://www.rdocumentation.org/badges/version/classiFunc)](https://www.rdocumentation.org/packages/classiFunc)
+[![Travis-CI Build Status](https://api.travis-ci.org/maierhofert/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.1.1-orange.svg?style=flat-square)](commits/master)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc)
+[![](https://cranlogs.r-pkg.org/badges/classiFunc)](https://cran.rstudio.com/web/packages/classiFunc/index.html)
+[![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+
+
 
 ## Overview
 The classiFunc package implements methods for functional data classification. The main functions of this package are classiKnn, a k nearest neighbor estimator for functional data, and classiKernel, a kernel estimator for functional data. The package uses efficiently implemented semimetrics to create the distance matrix of the functional observations in the function computeDistMat. 
