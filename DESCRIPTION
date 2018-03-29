@@ -8,7 +8,7 @@ Authors@R: c(
     person("Karen", "Fuchs", email = "karenfuchs@gmx.de", role = c("ctb")),
     person("Florian", "Pfisterer", email = "pfistererf@googlemail.com", role = c("aut")))
 URL: https://github.com/maierhofert/classiFunc
-Description: Efficient implementation of k-nearest neighbor estimator and a kernel estimator for functional data classification.
+Description: Efficient implementation of k-nearest neighbor estimation and kernel estimation for functional data classification.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
