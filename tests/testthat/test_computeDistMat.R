@@ -78,6 +78,7 @@ test_that("computeDistMat works for newly implemented metrics suggested in Fuchs
 })
 
 test_that("computeDistMat works rucrdtw metrics", {
+  skip_if_not_installed("rucrdtw")
   set.seed(123)
   dat = matrix(rnorm(n = 20), 5, byrow = TRUE)
 
