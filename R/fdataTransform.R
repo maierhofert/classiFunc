@@ -42,7 +42,9 @@ fdataTransform = function(grid, nderiv, derived, evenly.spaced,
       if (!no.missing) {
         fdata = t(apply(fdata, 1, zoo::na.spline))
       }
-      fda.fdata = fda::Data2fd(argvals = grid, t(fdata), ...)
+      basis = fda::create.bspline.basis(rangeval = range(grid))
+      fda.fdata = fda::smooth.basis(argvals = grid, y = t(fdata),
+                                    fdParobj = basis, ...)$fd
       if (!(derived | nderiv == 0L)) {
         fda.fdata = fda::deriv.fd(fda.fdata, nderiv = nderiv)
       }
