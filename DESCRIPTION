@@ -1,14 +1,14 @@
 Package: classiFunc
 Type: Package
 Title: Classification of Functional Data
-Version: 0.1.0
+Version: 0.1.1
 Date: 2017-03-23
 Authors@R: c(
     person("Thomas", "Maierhofer", email = "thomasjmaierhofer@gmail.com", role = c("aut", "cre")),
     person("Karen", "Fuchs", email = "karenfuchs@gmx.de", role = c("ctb")),
     person("Florian", "Pfisterer", email = "pfistererf@googlemail.com", role = c("aut")))
 URL: https://github.com/maierhofert/classiFunc
-Description: Efficient implementation of k-nearest neighbor estimator and a kernel estimator for functional data classification.
+Description: Efficient implementation of k-nearest neighbor estimation and kernel estimation for functional data classification.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -29,5 +29,6 @@ Imports:
     fdasrvf,
     proxy,
     rucrdtw,
-    stats
+    stats,
+    zoo
 VignetteBuilder: knitr

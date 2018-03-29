@@ -49,7 +49,7 @@
 #'   own distance function in the argument \code{custom.metric}.}
 #'   \item{\code{amplitudeDistance,phaseDistance}}{The amplitude distance or
 #'   phase distance as described in
-#'   Srivastava and Klassen (2016).
+#'   Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
 #'   }
 #'   \item{\code{FisherRao, elasticMetric}}{the elastic distance of the square
 #'   root velocity of the curves as described in Srivastava and Klassen (2016).
@@ -63,12 +63,8 @@
 #'   \code{lambda} is the additional penalization parameter for the warping
 #'   allowed before calculating the elastic distance. The default is 1.}
 #'  \item{\code{rucrdtw, rucred}}{Dynamic Time Warping Distance and Euclidean Distance
-#'   from package \code{\link{rucrdtw}}. Implemented in Boersch-Supan (2016).
-#'   rucrdtw: Fast time series subsequence
-#'   search in R. The Journal of Open Source Software URL http://doi.org/10.21105/joss.00100 and
-#'   originally described in Rakthanmanon et al. (2012). Searching and mining trillions
-#'   of time series subsequences under dynamic time
-#'   warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576}
+#'   from package \code{\link{rucrdtw}}. Implemented in Boersch-Supan (2016) and
+#'   originally described in Rakthanmanon et al. (2012).}
 #'   }
 #' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 [\code{integer(1)}]\cr
 #'   encode the indizes used to define subspaces for
@@ -108,9 +104,23 @@
 #'   functional observations within \code{x} to each other.
 #'
 #' @references
-#' Srivastava, A. and E. P. Klassen (2016). Functional and shape data analysis. Springer.
+#' Boersch-Supan (2016). rucrdtw: Fast time series subsequence
+#' search in R. The Journal of Open Source Software
+#' URL http://doi.org/10.21105/joss.00100
+#'
+#' Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+#' Nearest neighbor ensembles for functional data with interpretable feature selection.
+#' Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
+#'
+#' Rakthanmanon, Thanawin, et al.
+#' "Searching and mining trillions of time series subsequences under dynamic time warping."
+#' Proceedings of the 18th ACM SIGKDD international conference on Knowledge discovery and data mining.
+#' ACM, 2012.
+#'
+#' Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
 #'
 #' @importFrom stats quantile
+#' @importFrom rucrdtw ucrdtw_vv ucred_vv
 #' @export
 computeDistMat = function(x, y = NULL,
   method = "Euclidean",
@@ -213,6 +223,7 @@ computeDistMat = function(x, y = NULL,
   # New semimetric from TM
   # TODO check if this is correct
   if (method == "dtwPath") {
+    requirePackages("dtw")
     # define the difference of dtw paths
     dtwPath = function(x, y, ...) {
       dist = dtw::dtw(x, y, ...)
@@ -224,17 +235,20 @@ computeDistMat = function(x, y = NULL,
   # Metrics from the SRV framework
   # amplitude distance
   if (method %in% c("amplitudeDistance")) {
+    requirePackages("fdasrvf")
     return(computeDistMat(x, y, method = "elasticDistance",
       a = 1, b = 0, lambda = lambda))
   }
   # phase distance
   if (method %in% c("phaseDistance")) {
+    requirePackages("fdasrvf")
     return(computeDistMat(x, y, method = "elasticDistance",
       a = 0, b = 1, lambda = lambda))
   }
   # TODO check if this is mathematically correct
   # Fisher-Rao metric
   if (method %in% c("FisherRao", "elasticMetric")) {
+    requirePackages("fdasrvf")
     q1 = fdasrvf::f_to_srvf(t(x), time = 1:nrow(x))
     q2 = fdasrvf::f_to_srvf(t(y), time = 1:nrow(x))
     return(computeDistMat(t(q1), t(q2), method = "Euclidean"))
@@ -245,6 +259,7 @@ computeDistMat = function(x, y = NULL,
   # this method returns the phase and the amplitude distance
   # I do not know how it relates to the elastic metric
   if (method %in% c("elasticDistance")) {
+    requirePackages("fdasrvf")
     # input checking
     assertNumeric(a, lower = 0, len = 1L, null.ok = TRUE)
     assertNumeric(b, lower = 0, len = 1L, null.ok = TRUE)

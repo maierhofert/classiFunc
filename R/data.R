@@ -46,3 +46,173 @@
 #' Data Mining (ICDM), 2014 IEEE International Conference on. IEEE, 2014.
 #' @source \url{http://timeseriesclassification.com/description.php?Dataset=Phoneme}
 "Phoneme"
+
+
+##' Diffusion Tensor Imaging: tract profiles and outcomes
+##'
+##' Fractional anisotropy (FA) tract profiles for the corpus callosum (cca) and
+##' the right corticospinal tract (rcst). Accompanying the tract profiles are
+##' the subject ID numbers, visit number, total number of scans, multiple
+##' sclerosis case status and Paced Auditory Serial Addition Test (pasat)
+##' score.
+##'
+##' If you use this data as an example in written work, please include the
+##' following acknowledgment: ``The MRI/DTI data were collected at Johns
+##' Hopkins University and the Kennedy-Krieger Institute"
+##'
+##' Data and description was copied from the \code{\link[refund:refund-package]{refund}} package.
+##'
+##' @name DTI
+##' @docType data
+##' @format A data frame made up of \describe{
+##' \item{cca}{A 382 x 93
+##' matrix of fractional anisotropy tract profiles from the corpus
+##' callosum. Missing values were imputed using splines;}
+##' \item{rcst}{A 382 x 55 matrix
+##' of fractional anisotropy tract profiles from the right corticospinal
+##' tract. Missing values were imputed using splines;}
+##' \item{ID}{Numeric vector of subject ID numbers;}
+##' \item{visit}{Numeric vector of the subject-specific visit
+##' numbers;}
+##' \item{visit.time}{Numeric vector of the subject-specific visit time, measured
+##' in days since first visit;}
+##' \item{Nscans}{Numeric vector indicating the total number of visits
+##' for each subject;}
+##' \item{case}{Numeric vector of multiple sclerosis case status: 0 - healthy control, 1 - MS case;}
+##' \item{sex}{factor variable indicated subject's sex;}
+##'
+##' \item{pasat}{Numeric vector containing the PASAT score at
+##' each visit.}
+##' }
+##' @references Goldsmith, J., Bobb, J., Crainiceanu, C., Caffo, B., and Reich,
+##' D. (2011). Penalized Functional Regression. \emph{Journal of Computational
+##' and Graphical Statistics}, 20, 830 - 851.
+##'
+##' Goldsmith, J., Crainiceanu, C., Caffo, B., and Reich, D. (2010).
+##' Longitudinal Penalized Functional Regression for Cognitive Outcomes on
+##' Neuronal Tract Measurements. \emph{Journal of the Royal Statistical
+##' Society: Series C}, 61, 453 - 469.
+NULL
+
+##' Diffusion Tensor Imaging: tract profiles and outcomes
+##'
+##' Fractional anisotropy (FA) tract profiles for the corpus callosum (cca) and
+##' the right corticospinal tract (rcst). Accompanying the tract profiles are
+##' the subject ID numbers, visit number, total number of scans, multiple
+##' sclerosis case status and Paced Auditory Serial Addition Test (pasat)
+##' score.
+##'
+##' If you use this data as an example in written work, please include the
+##' following acknowledgment: ``The MRI/DTI data were collected at Johns
+##' Hopkins University and the Kennedy-Krieger Institute"
+##'
+##' Data and description was copied from the \code{\link[refund:refund-package]{refund}} package.
+##'
+##' @name DTI_original
+##' @docType data
+##' @format A data frame made up of \describe{
+##' \item{cca}{A 382 x 93
+##' matrix of fractional anisotropy tract profiles from the corpus
+##' callosum containing missing values;}
+##' \item{rcst}{A 382 x 55 matrix
+##' of fractional anisotropy tract profiles from the right corticospinal
+##' tract containing missing values;}
+##' \item{ID}{Numeric vector of subject ID numbers;}
+##' \item{visit}{Numeric vector of the subject-specific visit
+##' numbers;}
+##' \item{visit.time}{Numeric vector of the subject-specific visit time, measured
+##' in days since first visit;}
+##' \item{Nscans}{Numeric vector indicating the total number of visits
+##' for each subject;}
+##' \item{case}{Numeric vector of multiple sclerosis case status: 0 - healthy control, 1 - MS case;}
+##' \item{sex}{factor variable indicated subject's sex;}
+##'
+##' \item{pasat}{Numeric vector containing the PASAT score at
+##' each visit.}
+##' }
+##' @references Goldsmith, J., Bobb, J., Crainiceanu, C., Caffo, B., and Reich,
+##' D. (2011). Penalized Functional Regression. \emph{Journal of Computational
+##' and Graphical Statistics}, 20, 830 - 851.
+##'
+##' Goldsmith, J., Crainiceanu, C., Caffo, B., and Reich, D. (2010).
+##' Longitudinal Penalized Functional Regression for Cognitive Outcomes on
+##' Neuronal Tract Measurements. \emph{Journal of the Royal Statistical
+##' Society: Series C}, 61, 453 - 469.
+NULL
+
+
+##' Berkeley Growth Study Data
+##'
+##' A data frame containing the heights of 39 boys and 54 girls from age 1 to 18,
+##' the ages at which they were collected.
+##'
+##'
+##' Data and description was reformatted from the \code{\link[fda:fda-package]{fda}} package.
+##'
+##' @name Growth_irregular
+##' @docType data
+##' @format A list made up of \describe{
+##' \item{ID}{Factor of length 93 containing the subject IDs}
+##' \item{sex}{Factor encoding the sex of children with values in \code{c(`male`, `female`)}}
+##' \item{age}{Numeric vector of length 31 encoding the age at the measurements}
+##' \item{height}{A 93 x 31 matrix giving the height in cm of 93 children at 31 ages}
+##' }
+##' @details The ages are not equally spaced, see \code{Growth$age}.
+##' @references Ramsay, James O., and Silverman, Bernard W. (2006),
+##' Functional Data Analysis, 2nd ed., Springer, New York.
+##'
+##' Ramsay, James O., and Silverman, Bernard W. (2002),
+##' Applied Functional Data Analysis, Springer, New York, ch. 6.
+##'
+##' Tuddenham, R. D., and Snyder, M. M. (1954)
+##' "Physical growth of California boys and girls from birth to age 18",
+##'  University of California Publications in Child Development, 1, 183-364.
+##' @seealso Growth
+NULL
+
+##' Berkeley Growth Study Data (regular grid)
+##'
+##' A data frame containing the heights of 39 boys and 54 girls from age 1 to 18,
+##' the ages at which they were collected.
+##'
+##'
+##' Data and description was reformatted from the \code{\link[fda:fda-package]{fda}} package
+##' to be observed on a regular grid in one year steps.
+##'
+##' @name Growth
+##' @docType data
+##' @format A list made up of \describe{
+##' \item{ID}{Factor of length 93 containing the subject IDs}
+##' \item{sex}{Factor encoding the sex of children with values in \code{c(`male`, `female`)}}
+##' \item{height}{A 93 x 31 matrix giving the height in cm of 93 children at 31 ages}
+##' }
+##'  @inheritSection Growth_irregular references
+##'  @seealso Growth_irregular
+NULL
+
+
+##' Beetle/Fly Data
+##'
+##' Classification of Beetle and Fly outlines.
+##'
+##'
+##' MPEG-7 CE Shape-1 Part B is a database of binary images developed for testing
+##' MPEG-7 shape descriptors, and is available free online
+##' (http://www.dabi.temple.edu/~shape/MPEG7/dataset.html). It is used for testing
+##' contour/image and skeleton-based descriptors. Classes of images vary broadly,
+##' and include classes that are similar in shape to one another. There are 20
+##' instances of each class, and 60 classes in total. We have extracted the outlines
+##' of these images and mapped them into 1-D series of distances to the centre.
+##' Beetle/Fly is the problem of distinguishing between an outline of a beetle and a fly
+##'
+##' @section Format A data frame made up of:
+##' \describe{
+##' \item{att0 to att511}{Functional observation of outline.}
+##' \item{target}{Factor encoding if outline is from a beetle (1) or a fly (2).}
+##' }
+##'
+##' @references Hills J, Lines J, Baranauskas E, Mapp J, Bagnall A (2014).
+##' "Classifcation of time series by shapelet transformation."
+##' Data Mining and Knowledge Discovery, 28(4), 851-881.
+##' URL http://timeseriesclassification.com/description.php?Dataset=BeetleFly
+"BeetleFly"

@@ -88,6 +88,68 @@ test_that("classiKnn works for custom semimetrics", {
 
 })
 
+test_that("classiKnn works for DTI data set (contains missing values)", {
+  data("DTI_original")
+  DTI = DTI_original
+  classes = DTI[, "case"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(DTI), size = 0.8 * nrow(DTI), replace = FALSE)
+  test_inds = (1:nrow(DTI))[!(1:nrow(DTI)) %in% train_inds]
+
+  DTI = DTI[, !colnames(DTI) == "target"]
+
+  # fdata = DTI[train_inds,"cca"]
+  expect_warning({mod1 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"])})
+  expect_warning({mod2 = classiKnn(classes = classes[train_inds], fdata = DTI[train_inds, "cca"],
+                   nderiv = 1L, knn = 3L)})
+
+
+
+  pred1 = predict(mod1, predict.type = "prob")
+  checkmate::expect_matrix(pred1, any.missing = FALSE,
+                           nrows = nrow(mod1$fdata),
+                           ncols = length(levels(mod1$classes)))
+
+  pred2 = predict(mod2, newdata = DTI[train_inds, "cca"], predict.type = "response")
+  checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
+
+  pred3 = predict(mod2, newdata = DTI[1, "cca"], predict.type = "response")
+  checkmate::expect_factor(pred3, any.missing = FALSE, levels = levels(mod2$classes))
+})
+
+
+test_that("classiKnn works for growth data set (contains irregular grid)", {
+  data(Growth_irregular, package = "classiFunc")
+  Growth = Growth_irregular
+  classes = Growth$sex
+
+  set.seed(123)
+  train_inds = sample(1:length(classes), size = 0.8 * length(classes), replace = FALSE)
+  test_inds = (1:length(classes))[!(1:length(classes)) %in% train_inds]
+
+  # fdata = DTI[train_inds,"cca"]
+  mod1 = classiKnn(classes = classes[train_inds], grid = Growth$age_grid,
+                   fdata = Growth$height[train_inds,])
+  mod2 = classiKnn(classes = classes[train_inds], grid = Growth$age_grid,
+                   fdata = Growth$height[train_inds,],
+                   nderiv = 1L, knn = 3L)
+
+  pred1 = predict(mod1, predict.type = "prob")
+  checkmate::expect_matrix(pred1, any.missing = FALSE,
+                           nrows = nrow(mod1$fdata),
+                           ncols = length(levels(mod1$classes)))
+
+  pred2 = predict(mod2, newdata = Growth$height[test_inds,], predict.type = "response")
+  checkmate::expect_factor(pred2, any.missing = FALSE, levels = levels(mod2$classes))
+
+  pred3 = predict(mod2, newdata = Growth$height[test_inds,], predict.type = "response")
+  checkmate::expect_factor(pred3, any.missing = FALSE, levels = levels(mod2$classes))
+})
+
+
+
+
 test_that("classiKnn works for newly implemented semimetrics from Fuchs etal", {
   data("ArrowHead")
   classes = ArrowHead[,"target"]
@@ -155,7 +217,7 @@ test_that("classiKnn works with DTW distances", {
 
 
 test_that("classiKnn works with elastic distance from the square root velocity framework", {
-  # skip_if_not(requirePackages("fdasrvf"), stop = FALSE)
+  skip_if_not_installed("fdasrvf")
   data("ArrowHead")
   ArrowHead = subset(ArrowHead, subset = c(TRUE, FALSE),
                      select = c(FALSE, FALSE, TRUE))
@@ -174,3 +236,28 @@ test_that("classiKnn works with elastic distance from the square root velocity f
   expect_factor(pred1, len = length(test_inds), any.missing = FALSE,
                 levels = levels(classes[train_inds]))
 })
+
+
+test_that("classiKnn works with rucrdtw distance", {
+  skip_if_not_installed("rucrdtw")
+  data("ArrowHead")
+  ArrowHead = subset(ArrowHead, subset = c(TRUE, FALSE),
+                     select = c(FALSE, FALSE, TRUE))
+  classes = ArrowHead[, "target"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
+  test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
+
+  ArrowHead = ArrowHead[, !colnames(ArrowHead) == "target"]
+
+  mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "rucrdtw")
+  pred1 = predict(mod1, newdata = ArrowHead[test_inds,],
+                  predict.type = "response")
+  expect_factor(pred1, len = length(test_inds), any.missing = FALSE,
+                levels = levels(classes[train_inds]))
+})
+
+
+

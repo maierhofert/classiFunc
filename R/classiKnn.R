@@ -40,7 +40,7 @@
 #' only used if \code{deriv.method = "custom.method"}.
 #' A function of functional observations
 #' \code{x} and \code{y} returning their distance.
-#' The default is the Euclidean distance.
+#' The default is the L2 distance.
 #' See how to implement your distance function in \code{\link[proxy]{dist}}.
 #' @param ...
 #' further arguments to and from other methods. Hand over additional arguments to
@@ -96,7 +96,7 @@
 #' # create functional data as matrix with observations as rows
 #' fdata = Phoneme[,!colnames(Phoneme) == "target"]
 #'
-#' # create k = 3 nearest neighbors classifier with Euclidean distance (default) of the
+#' # create k = 3 nearest neighbors classifier with L2 distance (default) of the
 #' # first order derivative of the data
 #' mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
 #'                  nderiv = 1L, knn = 3L)
@@ -115,12 +115,12 @@
 #' @seealso \link{predict.classiKnn}
 #' @export
 classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
-  metric = "Euclidean", nderiv = 0L, derived = FALSE,
-  deriv.method = "base.diff",
-  custom.metric = function(x, y, ...) {
-    return(sqrt(sum((x - y) ^ 2)))
-  },
-  ...) {
+                     metric = "L2", nderiv = 0L, derived = FALSE,
+                     deriv.method = "base.diff",
+                     custom.metric = function(x, y, ...) {
+                       return(sqrt(sum((x - y) ^ 2)))
+                     },
+                     ...) {
   # check inputs
   if (class(fdata) == "data.frame")
     fdata = as.matrix(fdata)
@@ -137,23 +137,23 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
   assertChoice(deriv.method, c("base.diff", "fda.deriv.fd"))
 
   # check if data is evenly spaced  -> respace
-  evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)],
-    length.out = length(grid)),
-    check.attributes = FALSE)
+  evenly.spaced = isTRUE(all.equal(grid, seq(grid[1], grid[length(grid)],
+                                      length.out = length(grid)),
+                            check.attributes = FALSE))
   no.missing = !anyMissing(fdata)
 
-  # TODO write better warning message
+  # warning message for imputation
   if (!no.missing) {
     warning("There are missing values in fdata. They will be filled using a spline representation!")
   }
 
   # create a model specific preprocessing function for the data
   # here the data will be derived, respaced equally and missing values will be filled
-  this.fdataTransform = fdataTransform(fdata = fdata, grid = grid,
-    nderiv = nderiv, derived = derived,
-    evenly.spaced = evenly.spaced,
-    no.missing = no.missing,
-    deriv.method = deriv.method, ...)
+  this.fdataTransform = fdataTransform(grid = grid,
+                                       nderiv = nderiv, derived = derived,
+                                       evenly.spaced = evenly.spaced,
+                                       no.missing = no.missing,
+                                       deriv.method = deriv.method, ...)
   proc.fdata = this.fdataTransform(fdata)
 
   # delete the custom.metric function from output if not needed
@@ -161,15 +161,15 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
     custom.metric = character(0)
 
   ret = list(classes = classes,
-    fdata = fdata,
-    proc.fdata = proc.fdata,
-    grid = grid,
-    knn = knn,
-    metric = metric,
-    custom.metric = custom.metric,
-    nderiv = nderiv,
-    this.fdataTransform = this.fdataTransform,
-    call = as.list(match.call(expand.dots = FALSE)))
+             fdata = fdata,
+             proc.fdata = proc.fdata,
+             grid = grid,
+             knn = knn,
+             metric = metric,
+             custom.metric = custom.metric,
+             nderiv = nderiv,
+             this.fdataTransform = this.fdataTransform,
+             call = as.list(match.call(expand.dots = FALSE)))
   class(ret) = "classiKnn"
 
   return(ret)
@@ -201,7 +201,7 @@ classiKnn = function(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
 #' @seealso classiKnn
 #' @export
 predict.classiKnn = function(object, newdata = NULL, predict.type = "response",
-  parallel = FALSE, ...) {
+                             parallel = FALSE, ...) {
   # input checking
   if (!is.null(newdata)) {
     if (class(newdata) == "data.frame")
@@ -220,9 +220,9 @@ predict.classiKnn = function(object, newdata = NULL, predict.type = "response",
     distfun = "computeDistMat"
   }
   dist.mat = do.call(distfun, c(list(x = object$proc.fdata, y = newdata,
-    method = object$metric,
-    custom.metric = object$custom.metric, ...),
-    object$call$...))
+                                     method = object$metric,
+                                     custom.metric = object$custom.metric, ...),
+                                object$call$...))
 
 
   # matrix containing which nearest neighbor the training observation is
@@ -254,7 +254,7 @@ print.classiKnn = function(x, ...) {
   cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
   cat("algorithm: \n")
   cat(" metric =", x$metric, "\n")
-  cat(" k = ", x$knn, "\n")
+  cat(" knn = ", x$knn, "\n")
   cat(" nderiv =", x$nderiv, "\n")
   cat("\n")
 }

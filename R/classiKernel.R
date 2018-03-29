@@ -6,7 +6,7 @@
 #' and all semimetrics suggested in Fuchs et al. (2015).
 #' Additionally, all (semi-)metrics can be used on a derivative of arbitrary
 #' order of the functional observations.
-#' For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
+#' For kernel functions all kernels implemented in \code{\link[fda.usc:fda.usc-package]{fda.usc}}
 #' are available as well as custom kernel functions.
 #'
 #' @inheritParams classiKnn
@@ -15,7 +15,7 @@
 #'     implemented to have bandwidth = 1. The bandwidth is controlled via \code{h}
 #'     by using \code{K(x) = ker(x/h)} as the kernel function.
 #' @param ker [numeric(1)]\cr
-#'     character describing the kernel function to use. Available are
+#'     character string describing the kernel function to use. Available are
 #'     amongst others all kernel functions from \code{\link[fda.usc]{Kernel}}.
 #'     For the full list execute \code{\link{kerChoices}()}.
 #'     The usage of customized kernel function is symbolized by
@@ -110,7 +110,7 @@
 #' @seealso predict.classiKernel
 #' @export
 classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
-                        metric = "Euclidean", ker = "Ker.norm",
+                        metric = "L2", ker = "Ker.norm",
                         nderiv = 0L, derived = FALSE,
                         deriv.method = "base.diff",
                         custom.metric = function(x, y, ...) {
@@ -139,18 +139,18 @@ classiKernel = function(classes, fdata, grid = 1:ncol(fdata), h = 1,
 
 
   # check if data is evenly spaced  -> respace
-  evenly.spaced = all.equal(grid, seq(grid[1], grid[length(grid)],
-                                      length.out = length(grid)))
+  evenly.spaced = isTRUE(all.equal(grid, seq(grid[1], grid[length(grid)],
+                                             length.out = length(grid)),
+                                   check.attributes = FALSE))
   no.missing = !checkmate::anyMissing(fdata)
 
-  # TODO write better warning message
   if (!no.missing) {
     warning("There are missing values in fdata. They will be filled using a spline representation!")
   }
 
   # create a model specific preprocessing function for the data
   # here the data will be derived, respaced equally and missing values will be filled
-  this.fdataTransform = fdataTransform(fdata = fdata, grid = grid,
+  this.fdataTransform = fdataTransform(grid = grid,
                                        nderiv = nderiv, derived = derived,
                                        evenly.spaced = evenly.spaced,
                                        no.missing = no.missing,
@@ -238,7 +238,8 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
   # Apply distance function after dividing by bandwidth
   dist.kernel = apply(dist.mat / object$h, c(1, 2), this.ker)
 
-  raw.result = aggregate(dist.kernel, by = list(classes = object$classes), sum, drop = FALSE)
+  raw.result = aggregate(dist.kernel, by = list(classes = object$classes),
+                         sum, na.rm = TRUE, drop = FALSE)
 
   if (predict.type == "response") {
     # return class with highest probability
@@ -255,7 +256,7 @@ predict.classiKernel = function(object, newdata = NULL, predict.type = "response
       names(result) = raw.result$classes
     } else {
       result = t(apply(raw.result[, -1], 2, function(x) {
-        if (sum(x) > 0) x / sum(x)
+        if (sum(x, na.rm = TRUE) > 0) x / sum(x)
         else rep(1 / length(x), length(x)) # if all ker(dist(x,y)) == 0
       }))
       colnames(result) = raw.result$classes
@@ -274,7 +275,7 @@ print.classiKernel = function(x, ...) {
   cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
   cat("algorithm: \n")
   cat(" kernel =", x$ker, "\n")
-  cat(" k = ", x$knn, "\n")
+  cat(" h = ", x$h, "\n")
   cat(" nderiv =", x$nderiv, "\n")
   cat("\n")
 }

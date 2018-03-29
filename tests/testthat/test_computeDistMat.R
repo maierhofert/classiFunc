@@ -78,6 +78,7 @@ test_that("computeDistMat works for newly implemented metrics suggested in Fuchs
 })
 
 test_that("computeDistMat works rucrdtw metrics", {
+  skip_if_not_installed("rucrdtw")
   set.seed(123)
   dat = matrix(rnorm(n = 20), 5, byrow = TRUE)
 
@@ -90,9 +91,12 @@ test_that("computeDistMat works rucrdtw metrics", {
   dist3 = computeDistMat(x = dat, method = "rucred")
   expect_true(is.matrix(dist3))
 
+  as.vector(dist1)
+  as.vector(dist2)
+  as.vector(dist3)
   # For a bigger window, dists have to be <=
   expect_true(all(as.vector(dist1) >= as.vector(dist2)))
   # dtw has to be <= euclidean
-  expect_true(all(as.vector(dist1) >= as.vector(dist3)))
+  expect_true(all(as.vector(dist1) <= as.vector(dist3)))
 
 })

@@ -34,8 +34,12 @@ vignette: >
   # first order derivative of the data
   mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
                   nderiv = 1L, knn = 3L)
-  # or create a kernel estimator
-  mod2 = classiKernel(classes = classes[train_inds], fdata = fdata[train_inds,])
+  # or create a kernel estimator with the global maxima distance proposed in Fuchs et al. 2016
+  # check available semimetrics
+  metricChoices()
+  # create model
+  mod2 = classiKernel(classes = classes[train_inds], fdata = fdata[train_inds,],
+                      metric = "globMax")
   
   # predict the class labels for the test set
   pred = predict(mod, newdata =  fdata[test_inds,])
@@ -47,7 +51,7 @@ vignette: >
   pred.prob = predict(mod, newdata =  fdata[test_inds,], predict.type = "prob")
   
 ```
-   It is also possible to predict all models in parallel. This can lead to significant speed ups for models using computationally intensive distance metrics.
+   It is also possible to parallelize across batches (subsets) of data during prediction. This can lead to significant speed ups for models using computationally intensive distance metrics.
 ```{r, eval = FALSE, results='asis'}
 # Parallelize across 2 CPUs
 library("parallelMap")

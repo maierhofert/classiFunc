@@ -4,10 +4,10 @@
 \alias{classiKnn}
 \title{Create a knn estimator for functional data classification.}
 \usage{
-classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L,
-  metric = "Euclidean", nderiv = 0L, derived = FALSE,
-  deriv.method = "base.diff", custom.metric = function(x, y, ...) {    
-  return(sqrt(sum((x - y)^2))) }, ...)
+classiKnn(classes, fdata, grid = 1:ncol(fdata), knn = 1L, metric = "L2",
+  nderiv = 0L, derived = FALSE, deriv.method = "base.diff",
+  custom.metric = function(x, y, ...) {     return(sqrt(sum((x - y)^2))) },
+  ...)
 }
 \arguments{
 \item{classes}{[\code{factor(nrow(fdata))}]\cr
@@ -52,7 +52,7 @@ high order derivatives.}
 only used if \code{deriv.method = "custom.method"}.
 A function of functional observations
 \code{x} and \code{y} returning their distance.
-The default is the Euclidean distance.
+The default is the L2 distance.
 See how to implement your distance function in \code{\link[proxy]{dist}}.}
 
 \item{...}{further arguments to and from other methods. Hand over additional arguments to
@@ -111,7 +111,7 @@ test_inds = (1:nrow(Phoneme))[!(1:nrow(Phoneme)) \%in\% train_inds]
 # create functional data as matrix with observations as rows
 fdata = Phoneme[,!colnames(Phoneme) == "target"]
 
-# create k = 3 nearest neighbors classifier with Euclidean distance (default) of the
+# create k = 3 nearest neighbors classifier with L2 distance (default) of the
 # first order derivative of the data
 mod = classiKnn(classes = classes[train_inds], fdata = fdata[train_inds,],
                  nderiv = 1L, knn = 3L)
