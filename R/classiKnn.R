@@ -254,7 +254,7 @@ print.classiKnn = function(x, ...) {
   cat("", nrow(x$fdata), "observations of length", ncol(x$fdata), "\n")
   cat("algorithm: \n")
   cat(" metric =", x$metric, "\n")
-  cat(" k = ", x$knn, "\n")
+  cat(" knn = ", x$knn, "\n")
   cat(" nderiv =", x$nderiv, "\n")
   cat("\n")
 }
