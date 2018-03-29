@@ -60,7 +60,7 @@
 ##' following acknowledgment: ``The MRI/DTI data were collected at Johns
 ##' Hopkins University and the Kennedy-Krieger Institute"
 ##'
-##' Data and description was copied from the \code{\link[refund]{refund}} package.
+##' Data and description was copied from the \code{\link[refund:refund-package]{refund}} package.
 ##'
 ##' @name DTI
 ##' @docType data
@@ -106,7 +106,7 @@ NULL
 ##' following acknowledgment: ``The MRI/DTI data were collected at Johns
 ##' Hopkins University and the Kennedy-Krieger Institute"
 ##'
-##' Data and description was copied from the \code{\link[refund]{refund}} package.
+##' Data and description was copied from the \code{\link[refund:refund-package]{refund}} package.
 ##'
 ##' @name DTI_original
 ##' @docType data
@@ -147,7 +147,7 @@ NULL
 ##' the ages at which they were collected.
 ##'
 ##'
-##' Data and description was reformatted from the \code{\link[fda]{fda}} package.
+##' Data and description was reformatted from the \code{\link[fda:fda-package]{fda}} package.
 ##'
 ##' @name Growth_irregular
 ##' @docType data
@@ -176,7 +176,7 @@ NULL
 ##' the ages at which they were collected.
 ##'
 ##'
-##' Data and description was reformatted from the \code{\link[fda]{fda}} package
+##' Data and description was reformatted from the \code{\link[fda:fda-package]{fda}} package
 ##' to be observed on a regular grid in one year steps.
 ##'
 ##' @name Growth
