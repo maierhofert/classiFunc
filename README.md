@@ -3,7 +3,7 @@
 classiFunc
 ==========
 
-[![Travis-CI Build Status](https://travis-ci.org/r-lib/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc) <!-- [![CRAN Status Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc) --> [![Rdoc](https://www.rdocumentation.org/badges/version/classiFunc)](https://www.rdocumentation.org/packages/classiFunc)
+[![Travis-CI Build Status](https://travis-ci.org/r-lib/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc) <!-- [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc) --> [![Rdoc](https://www.rdocumentation.org/badges/version/classiFunc)](https://www.rdocumentation.org/packages/classiFunc)
 
 Overview
 --------
