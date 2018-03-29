@@ -3,7 +3,7 @@
 classiFunc
 ==========
 
-TODO fix URLs, see Ligges email [![Travis-CI Build Status](https://travis-ci.org/r-lib/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc) <!-- [![CRAN Status Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc) --> [![Rdoc](https://www.rdocumentation.org/badges/version/classiFunc)](https://www.rdocumentation.org/packages/classiFunc)
+[![Travis-CI Build Status](https://travis-ci.org/r-lib/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc) <!-- [![CRAN Status Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc) --> [![Rdoc](https://www.rdocumentation.org/badges/version/classiFunc)](https://www.rdocumentation.org/packages/classiFunc)
 
 Overview
 --------
@@ -13,7 +13,7 @@ The classiFunc package implements methods for functional data classification. Th
 Using classiFunc
 ----------------
 
-For installation instructions, see below. A hands on introduction to can be found in the [vignette](https://cran.r-project.org/web/packages/classiFunc/vignettes/classiFunc.html). Details on specific functions are in the [reference manual](https://cran.r-project.org/web/packages/classiFunc/classiFunc.pdf).
+For installation instructions, see below. A hands on introduction to can be found in the [vignette](https://cran.r-project.org/package=classiFunc/vignettes/classiFunc.html). Details on specific functions are in the [reference manual](https://cran.r-project.org/package=classiFunc/classiFunc.pdf).
 
 Issues & Feature Requests
 -------------------------
