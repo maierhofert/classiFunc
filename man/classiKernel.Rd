@@ -115,7 +115,7 @@ supported distance measures are all \code{metrics} implemented in \code{\link[pr
 and all semimetrics suggested in Fuchs et al. (2015).
 Additionally, all (semi-)metrics can be used on a derivative of arbitrary
 order of the functional observations.
-For kernel functions all kernels implemented in \code{\link[fda.usc]{fda.usc}}
+For kernel functions all kernels implemented in \code{\link[fda.usc:fda.usc-package]{fda.usc}}
 are available as well as custom kernel functions.
 }
 \examples{

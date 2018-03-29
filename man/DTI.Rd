@@ -36,7 +36,7 @@ If you use this data as an example in written work, please include the
 following acknowledgment: ``The MRI/DTI data were collected at Johns
 Hopkins University and the Kennedy-Krieger Institute"
 
-Data and description was copied from the \code{\link[refund]{refund}} package.
+Data and description was copied from the \code{\link[refund:refund-package]{refund}} package.
 }
 \references{
 Goldsmith, J., Bobb, J., Crainiceanu, C., Caffo, B., and Reich,

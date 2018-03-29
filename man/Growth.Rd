@@ -16,6 +16,6 @@ A data frame containing the heights of 39 boys and 54 girls from age 1 to 18,
 the ages at which they were collected.
 }
 \details{
-Data and description was reformatted from the \code{\link[fda]{fda}} package
+Data and description was reformatted from the \code{\link[fda:fda-package]{fda}} package
 to be observed on a regular grid in one year steps.
 }
