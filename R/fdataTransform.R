@@ -14,7 +14,7 @@
 #' @return Pipeline function taking one argument \code{fdata}. The returned
 #' function carries out all the preprocessing needed for the calling model
 #' of class \code{\link{classiKnn}}.
-#'
+#' @importFrom fda create.bspline.basis smooth.basis deriv.fd eval.fd
 #' @export
 fdataTransform = function(grid, nderiv, derived, evenly.spaced,
                           no.missing, deriv.method, ...) {
