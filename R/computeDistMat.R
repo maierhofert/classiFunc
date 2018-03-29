@@ -104,18 +104,23 @@
 #'   functional observations within \code{x} to each other.
 #'
 #' @references
-#' Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
-#'
 #' Boersch-Supan (2016). rucrdtw: Fast time series subsequence
 #' search in R. The Journal of Open Source Software
 #' URL http://doi.org/10.21105/joss.00100
+#'
+#' Fuchs, K., J. Gertheiss, and G. Tutz (2015):
+#' Nearest neighbor ensembles for functional data with interpretable feature selection.
+#' Chemometrics and Intelligent Laboratory Systems 146, 186 - 197.
 #'
 #' Rakthanmanon, Thanawin, et al.
 #' "Searching and mining trillions of time series subsequences under dynamic time warping."
 #' Proceedings of the 18th ACM SIGKDD international conference on Knowledge discovery and data mining.
 #' ACM, 2012.
 #'
+#' Srivastava, A. and E. P. Klassen (2016). Functional and Shape Data Analysis. Springer.
+#'
 #' @importFrom stats quantile
+#' @importFrom rucrdtw ucrdtw_vv
 #' @export
 computeDistMat = function(x, y = NULL,
   method = "Euclidean",
