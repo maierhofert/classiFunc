@@ -217,7 +217,7 @@ test_that("classiKnn works with DTW distances", {
 
 
 test_that("classiKnn works with elastic distance from the square root velocity framework", {
-  # skip_if_not(requirePackages("fdasrvf"), stop = FALSE)
+  skip_if_not_installed("fdasrvf")
   data("ArrowHead")
   ArrowHead = subset(ArrowHead, subset = c(TRUE, FALSE),
                      select = c(FALSE, FALSE, TRUE))
@@ -236,3 +236,28 @@ test_that("classiKnn works with elastic distance from the square root velocity f
   expect_factor(pred1, len = length(test_inds), any.missing = FALSE,
                 levels = levels(classes[train_inds]))
 })
+
+
+test_that("classiKnn works with rucrdtw distance", {
+  skip_if_not_installed("rucrdtw")
+  data("ArrowHead")
+  ArrowHead = subset(ArrowHead, subset = c(TRUE, FALSE),
+                     select = c(FALSE, FALSE, TRUE))
+  classes = ArrowHead[, "target"]
+
+  set.seed(123)
+  train_inds = sample(1:nrow(ArrowHead), size = 0.8 * nrow(ArrowHead), replace = FALSE)
+  test_inds = (1:nrow(ArrowHead))[!(1:nrow(ArrowHead)) %in% train_inds]
+
+  ArrowHead = ArrowHead[, !colnames(ArrowHead) == "target"]
+
+  mod1 = classiKnn(classes = classes[train_inds], fdata = ArrowHead[train_inds,],
+                   metric = "rucrdtw")
+  pred1 = predict(mod1, newdata = ArrowHead[test_inds,],
+                  predict.type = "response")
+  expect_factor(pred1, len = length(test_inds), any.missing = FALSE,
+                levels = levels(classes[train_inds]))
+})
+
+
+

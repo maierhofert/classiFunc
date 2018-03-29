@@ -24,7 +24,8 @@ test_that("Works with kernel / knn", {
   pred2 = predict(mod, newdata = tst, parallel = TRUE, batches = 2)
   expect_true(all.equal(pred, pred2))
 
-  mod = classiKnn(c(1, 1, 2, 2, 1), fdata = trn, knn = 1L, metric = "shortEuclidean", dmin = 0, dmax = 1/2)
+  mod = classiKnn(c(1, 1, 2, 2, 1), fdata = trn, knn = 1L, metric = "shortEuclidean",
+                  dmin = 0, dmax = 1/2)
   pred = predict(mod, newdata = tst)
   pred2 = predict(mod, newdata = tst, parallel = TRUE, batches = 2)
   expect_true(all.equal(pred, pred2))
