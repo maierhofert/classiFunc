@@ -97,6 +97,6 @@ test_that("computeDistMat works rucrdtw metrics", {
   # For a bigger window, dists have to be <=
   expect_true(all(as.vector(dist1) >= as.vector(dist2)))
   # dtw has to be <= euclidean
-  expect_true(all(as.vector(dist1) >= as.vector(dist3)))
+  expect_true(all(as.vector(dist1) <= as.vector(dist3)))
 
 })
