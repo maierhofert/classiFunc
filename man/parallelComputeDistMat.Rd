@@ -2,7 +2,7 @@
 % Please edit documentation in R/computeDistMat.R
 \name{parallelComputeDistMat}
 \alias{parallelComputeDistMat}
-\title{Parallize computing a distance matrix for functional observations}
+\title{Paralleize computing a distance matrix for functional observations}
 \usage{
 parallelComputeDistMat(x, y = NULL, method = "Euclidean", batches = 1L,
   ...)
@@ -36,7 +36,7 @@ see \code{x}. The default \code{NULL} uses \code{y = x}.}
  the observations.}
  \item{\code{relAreas}}{the difference of the relation of two areas on parts
  of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
- \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
+ \code{dmax2}. They are defined analogously to \code{dmin} and \code{dmax}
  and take the same default values.}
  \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2},
  i.e. \code{x[t1 * length(x)] - x[t2 * length(x)]} for every functional observation \code{x}.

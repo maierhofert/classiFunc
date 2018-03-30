@@ -21,7 +21,7 @@ The shapes of the projectile points are converted into a time series using
 the angle-based method. The classification of projectile points is an
 important topic in anthropology. The classes are based on shape distinctions
 such as the presence and location of a notch in the arrow. The problem in the
-repository is a length normalised version of that used in Ye09shapelets.
+repository is a length normalized version of that used in Ye09shapelets.
 The three classes are called "Avonlea", "Clovis" and "Mix".
 }
 \section{Format A data frame with 100 rows (=observations) and 84 variables}{

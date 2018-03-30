@@ -12,7 +12,7 @@
 Phoneme
 }
 \description{
-A data set containing the audio files of english words.
+A data set containing the audio files of English words.
 }
 \details{
 This data set is a subsample of the data used in Hamooni and Mueen (2014).

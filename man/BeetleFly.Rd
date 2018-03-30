@@ -31,7 +31,7 @@ Beetle/Fly is the problem of distinguishing between an outline of a beetle and a
 
 \references{
 Hills J, Lines J, Baranauskas E, Mapp J, Bagnall A (2014).
-"Classifcation of time series by shapelet transformation."
+"Classification of time series by shapelet transformation."
 Data Mining and Knowledge Discovery, 28(4), 851-881.
 URL http://timeseriesclassification.com/description.php?Dataset=BeetleFly
 }
