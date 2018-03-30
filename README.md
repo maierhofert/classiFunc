@@ -7,7 +7,7 @@
 Status](https://api.travis-ci.org/maierhofert/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.1.1-orange.svg?style=flat-square)](commits/master)
 [![CRAN\_Status\_Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc)
-[![](https://cranlogs.r-pkg.org/badges/classiFunc)](https://cran.rstudio.com/web/packages/classiFunc/index.html)
+[![](https://cranlogs.r-pkg.org/badges/classiFunc)](https://cran.r-project.org/package=classiFunc)
 [![Licence](https://img.shields.io/badge/licence-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 
 ## Overview
