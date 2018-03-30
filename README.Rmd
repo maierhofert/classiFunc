@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 ```
 
 # classiFunc
-[![Travis-CI Build Status](https://api.travis-ci.org/maierhofert/classiFunc.svg?branch=master)](https://travis-ci.org/r-lib/classiFunc)
+[![Travis-CI Build Status](https://api.travis-ci.org/maierhofert/classiFunc.svg?branch=master)](https://travis-ci.org/maierhofert/classiFunc)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.1.1-orange.svg?style=flat-square)](commits/master)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/classiFunc)](https://cran.r-project.org/package=classiFunc)
 [![](https://cranlogs.r-pkg.org/badges/classiFunc)](https://cran.r-project.org/package=classiFunc)
