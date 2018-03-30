@@ -1,6 +1,6 @@
 #' @title Compute a distance matrix for functional observations
 #'
-#' @description This mainly internal function offers a unified framework to acces the
+#' @description This mainly internal function offers a unified framework to access the
 #' \code{\link[proxy]{dist}} function from the \code{proxy} package and additional
 #' (semi-)metrics.
 #'
@@ -30,7 +30,7 @@
 #'   the observations.}
 #'   \item{\code{relAreas}}{the difference of the relation of two areas on parts
 #'   of the domain given by \code{dmin1} to \code{dmax1} and \code{dmin2} to
-#'   \code{dmax2}. They are definded analougously to \code{dmin} and \code{dmax}
+#'   \code{dmax2}. They are defined analogously to \code{dmin} and \code{dmax}
 #'   and take the same default values.}
 #'   \item{\code{jump}}{the similarity of jump heights at points \code{t1} and \code{t2},
 #'   i.e. \code{x[t1 * length(x)] - x[t2 * length(x)]} for every functional observation \code{x}.
@@ -67,7 +67,7 @@
 #'   originally described in Rakthanmanon et al. (2012).}
 #'   }
 #' @param dmin,dmax,dmin1,dmax1,dmin2,dmax2 [\code{integer(1)}]\cr
-#'   encode the indizes used to define subspaces for
+#'   encode the indices used to define subspaces for
 #'   \code{method \%in\% c("shortEuclidean", "relAreas")}
 #'   as numeric values between 0 and 1, where 0 encodes \code{grid[1]} and
 #'   1 encodes \code{grid[length(grid)]}.
@@ -87,7 +87,7 @@
 #'   The default is the Euclidean distance (equals Minkwoski distance
 #'   with \code{lp = 2}). Used for \code{method = "custom.metric"}.
 #' @param a,b,c [\code{numeric(1)}]\cr
-#'   weigths of the amplitude distance (\code{a}) and the phase distance (\code{b})
+#'   weights of the amplitude distance (\code{a}) and the phase distance (\code{b})
 #'   in a semimetric that combines them by addition.
 #'   Used for \code{method == 'elasticDistance'}.
 #' @param lambda [\code{numeric(1)}]\cr
@@ -342,7 +342,7 @@ computeDistMat = function(x, y = NULL,
 
 }
 
-#' @title Parallize computing a distance matrix for functional observations
+#' @title Paralleize computing a distance matrix for functional observations
 #'
 #' @description
 #'   Uses \code{\link[parallelMap]{parallelMap}} to parallelize the computation of the distance
