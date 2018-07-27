@@ -25,9 +25,10 @@ metricChoices = function(proxy.only = FALSE) {
     additional_metric_names = c("shortEuclidean", "mean", "relAreas",
       "jump", "globMax", "globMin", "points", "custom.metric",
       "amplitudeDistance", "phaseDistance", "FisherRao", "elasticMetric",
-      "elasticDistance", "dtwPath")
+      "elasticDistance", "dtwPath", "rucrdtw", "rucred")
     names(additional_metric_names) = additional_metric_names
-
-    return(c(proxy_metric_names, additional_metric_names))
+    choices = c(proxy_metric_names, additional_metric_names)
+    # Make sure we have unique names
+    return(choices[unique(names(choices))])
   }
 }
