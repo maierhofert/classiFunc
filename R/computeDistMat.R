@@ -306,18 +306,12 @@ computeDistMat = function(x, y = NULL,
   # Dynamic Time Warping Distance from rucrdtw package
   if (method == "rucrdtw") {
     requirePackages("rucrdtw")
-    ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
-      rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
-    }
 
     return(as.matrix(proxy::dist(x, y, method = "rucrdtw", ...)))
   }
   # Euclidean Distance from rucrdtw package
   if (method == "rucred") {
     requirePackages("rucrdtw")
-    ucred = function(x, y, ...) {
-      rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
-    }
 
     return(as.matrix(proxy::dist(x, y, method = "rucred", ..., PACKAGE = "rucrdtw")))
   }

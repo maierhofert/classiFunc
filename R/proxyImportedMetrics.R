@@ -1,3 +1,7 @@
+ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
+  rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
+}
+
 pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
   loop = TRUE, type = "metric",
   description = "Dynamic Time Warping from UCR",
@@ -6,6 +10,10 @@ pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
     Rakthanmanon et al. (2012). Searching and mining trillions of time series subsequences
     under dynamic time warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
   formula = "minimum of sum(x[xw[i]]-y[yw[i]]) over all monotonic xw, yw");
+
+ucred = function(x, y, ...) {
+  rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
+}
 
 pr_DB$set_entry(FUN = ucred, names = "rucred",
   loop = TRUE, type = "metric",
