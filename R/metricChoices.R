@@ -25,7 +25,7 @@ metricChoices = function(proxy.only = FALSE) {
     additional_metric_names = c("shortEuclidean", "mean", "relAreas",
       "jump", "globMax", "globMin", "points", "custom.metric",
       "amplitudeDistance", "phaseDistance", "FisherRao", "elasticMetric",
-      "elasticDistance", "dtwPath", "rucrdtw", "rucred")
+      "elasticDistance", "dtwPath")
     names(additional_metric_names) = additional_metric_names
 
     return(c(proxy_metric_names, additional_metric_names))
