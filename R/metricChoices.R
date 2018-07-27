@@ -18,17 +18,17 @@ metricChoices = function(proxy.only = FALSE) {
   proxy.list = proxy::pr_DB$get_entries()
   is_metric = unlist(BBmisc::extractSubList(proxy.list, element = "type")) == "metric"
   proxy_metric_names = unlist(BBmisc::extractSubList(proxy.list[is_metric],
-                                                     element = "names"))
+    element = "names"))
   if (proxy.only) {
     return(proxy_metric_names)
   } else {
-    return(c(proxy_metric_names,
-             "shortEuclidean", "mean", "relAreas",
-             "jump", "globMax", "globMin",
-             "points", "custom.metric",
-             "amplitudeDistance", "phaseDistance",
-             "FisherRao", "elasticMetric",
-             "elasticDistance",
-             "dtwPath", "rucrdtw", "rucred"))
+    additional_metric_names = c("shortEuclidean", "mean", "relAreas",
+      "jump", "globMax", "globMin", "points", "custom.metric",
+      "amplitudeDistance", "phaseDistance", "FisherRao", "elasticMetric",
+      "elasticDistance", "dtwPath", "rucrdtw", "rucred")
+    names(additional_metric_names) = additional_metric_names
+    choices = c(proxy_metric_names, additional_metric_names)
+    # Make sure we have unique names
+    return(choices[unique(names(choices))])
   }
 }
