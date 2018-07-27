@@ -1,8 +1,7 @@
-ucrdtw = function(x, y, dtwwindow = 0.05, ...) {
-  rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
-}
-
-pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
+pr_DB$set_entry(FUN = function(x, y, dtwwindow = 0.05, ...) {
+    rucrdtw::ucrdtw_vv(x, y, skip = TRUE, dtwwindow = dtwwindow, ...)$distance
+  },
+  names = "rucrdtw",
   loop = TRUE, type = "metric",
   description = "Dynamic Time Warping from UCR",
   reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R.
@@ -11,11 +10,11 @@ pr_DB$set_entry(FUN = ucrdtw, names = "rucrdtw",
     under dynamic time warping. SIGKDD URL http://doi.org/10.1145/2339530.2339576",
   formula = "minimum of sum(x[xw[i]]-y[yw[i]]) over all monotonic xw, yw");
 
-ucred = function(x, y, ...) {
-  rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
-}
-
-pr_DB$set_entry(FUN = ucred, names = "rucred",
+pr_DB$set_entry(
+  FUN = function(x, y, ...) {
+    rucrdtw::ucred_vv(data = x, query = y, skip = TRUE, ...)$distance
+  },
+  names = "rucred",
   loop = TRUE, type = "metric",
   description = "Euclidean Distance from UCR",
   reference = "Boersch-Supan (2016). rucrdtw: Fast time series subsequence search in R.
